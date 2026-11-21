@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>UniBio Purchase</title>
+    <style>
+        :root {
+            --bg: #1a1f1e;
+            --card: #212827;
+            --line: #2e3837;
+            --tx: #e9ece9;
+            --mut: #9aa6a3;
+            --side: #1e3a5f;
+            --acc: #c47a38;
+            --ok: #3f9d68;
+            --bad: #d4623e;
+            --warn: #d9a441;
+            --inp: #171c1b;
+            color-scheme: dark;
+            box-sizing: border-box;
+            padding-top: env(safe-area-inset-top, 0px);
+            padding-bottom: env(safe-area-inset-bottom, 0px)
+        }
+
+        @media (prefers-color-scheme:light) {
+            :root:not([data-theme="dark"]) {
+                --bg: #f4f5f3;
+                --card: #fff;
+                --line: #d9dedc;
+                --tx: #1c2321;
+                --mut: #5d6a67;
+                --inp: #f7f8f7;
+                --ok: #2e7d4f;
+                --bad: #b8472a;
+                --warn: #9a6f10;
+                color-scheme: light
+            }
+        }
+
+        :root[data-theme="light"] {
+            --bg: #f4f5f3;
+            --card: #fff;
+            --line: #d9dedc;
+            --tx: #1c2321;
+            --mut: #5d6a67;
+            --inp: #f7f8f7;
+            --ok: #2e7d4f;
+            --bad: #b8472a;
+            --warn: #9a6f10;
+            color-scheme: light
+        }
+
+        html {
+            scroll-padding-top: env(safe-area-inset-top, 0px)
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--tx);
+            font: 14px/1.45 Inter, system-ui, -apple-system, "Segoe UI", sans-serif
+        }
+
+        .app {
+            display: grid;
+            grid-template-columns: 230px 1fr;
+            min-height: 100vh
+        }
+
+        aside {
+            background: var(--side);
+            padding: 22px 12px;
+            display: flex;
+            flex-direction: column;
+            color: #e9eef5
+        }
+
+        .logo {
+            font: 700 22px Georgia, "Times New Roman", serif;
+            padding: 0 10px 22px
+        }
+
+        .logo i {
+            color: var(--acc);
+            font-style: normal
+        }
+
+        nav button {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: 0;
+            color: #c9d6e6;
+            padding: 10px;
+            border-radius: 8px;
+            font: inherit;
+            cursor: pointer;
+            margin-bottom: 2px
+        }
+
+        nav button:before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #8aa0bb
+        }
+
+        nav button.on {
+            background: rgba(255, 255, 255, .14);
+            color: #fff;
+            font-weight: 600
+        }
+
+        .badge {
+            margin-left: auto;
+            background: var(--acc);
+            color: #fff;
+            border-radius: 10px;
+            padding: 0 7px;
+            font-size: 11px
+        }
+
+        .who {
+            margin-top: auto;
+            border-top: 1px solid rgba(255, 255, 255, .15);
+            padding: 14px 10px 0;
+            font-size: 12px;
+            color: #9fb2c9;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .who-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .who-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--acc);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .who-details {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .who-name {
+            font-weight: 600;
+            color: #fff;
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .who-role {
+            font-size: 11px;
+            color: #a4b8cc;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .who-site {
+            font-size: 10px;
+            color: #8aa0bb;
+            background: rgba(255, 255, 255, .08);
+            padding: 2px 6px;
+            border-radius: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 2px;
+            display: inline-block;
+            max-width: 100%;
+        }
+
+        .btn-logout {
+            width: 100%;
+            background: rgba(255, 255, 255, .08);
+            color: #c9d6e6;
+            border: 1px solid rgba(255, 255, 255, .15);
+            border-radius: 6px;
+            padding: 7px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all .2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-logout:hover {
+            background: rgba(212, 98, 62, .25);
+            border-color: var(--bad);
+            color: #fff;
+        }
+
+        /* Embedded Login Screen */
+        .auth-view {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 16px;
+            background: var(--bg);
+            position: relative;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 460px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .brand-header .logo {
+            font: 700 32px Georgia, serif;
+            display: inline-block;
+            padding: 0;
+        }
+
+        .brand-header .sub-brand {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--mut);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        .auth-card {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 30px 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        .auth-card h2 {
+            font: 700 20px Georgia, serif;
+            margin: 0 0 4px;
+        }
+
+        .auth-card p.auth-desc {
+            font-size: 13px;
+            color: var(--mut);
+            margin: 0 0 20px;
+        }
+
+        .input-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .pw-toggle {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            color: var(--mut);
+            cursor: pointer;
+            font-size: 12px;
+            padding: 4px;
+        }
+
+        .pw-toggle:hover {
+            color: var(--tx);
+        }
+
+        .row-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            margin: 10px 0 20px;
+            color: var(--mut);
+        }
+
+        .remember-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .remember-wrap input[type="checkbox"] {
+            accent-color: var(--acc);
+            width: 15px;
+            height: 15px;
+            cursor: pointer;
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: var(--acc);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font: 600 15px inherit;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.18s;
+        }
+
+        .btn-submit:hover {
+            filter: brightness(1.1);
+        }
+
+        .demo-section {
+            margin-top: 24px;
+            padding-top: 18px;
+            border-top: 1px dashed var(--line);
+        }
+
+        .demo-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--mut);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 8px;
+        }
+
+        .demo-btn {
+            background: var(--inp);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 8px 10px;
+            color: var(--tx);
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.15s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .demo-btn:hover {
+            border-color: var(--acc);
+            background: rgba(196, 122, 56, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .demo-role {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--acc);
+        }
+
+        .demo-name {
+            font-size: 11px;
+            color: var(--mut);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .msg-banner {
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .msg-banner.error {
+            display: block;
+            background: rgba(212, 98, 62, 0.15);
+            color: #f78d70;
+            border: 1px solid rgba(212, 98, 62, 0.3);
+        }
+
+        .msg-banner.info {
+            display: block;
+            background: rgba(30, 58, 95, 0.35);
+            color: #9fb2c9;
+            border: 1px solid rgba(138, 160, 187, 0.3);
+        }
+
+        .msg-banner.success {
+            display: block;
+            background: rgba(63, 157, 104, 0.15);
+            color: #6ed199;
+            border: 1px solid rgba(63, 157, 104, 0.3);
+        }
+
+        main {
+            padding: 26px 30px;
+            min-width: 0
+        }
+
+        .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 18px;
+            flex-wrap: wrap
+        }
+
+        h1 {
+            font: 700 28px Georgia, serif;
+            margin: 0
+        }
+
+        .sub {
+            color: var(--mut);
+            margin-top: 2px
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 18px
+        }
+
+        .card h3 {
+            margin: 0 0 14px;
+            font-size: 14px;
+            color: var(--mut);
+            font-weight: 600
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 14px
+        }
+
+        .f span {
+            display: block;
+            color: var(--mut);
+            font-size: 12px;
+            margin-bottom: 5px
+        }
+
+        input,
+        select {
+            width: 100%;
+            background: var(--inp);
+            color: var(--tx);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 9px 10px;
+            font: inherit
+        }
+
+        input[readonly],
+        input:disabled,
+        select:disabled {
+            opacity: .7
+        }
+
+        .btn {
+            background: var(--acc);
+            color: #fff;
+            border: 0;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font: 600 14px inherit;
+            font-family: inherit;
+            cursor: pointer
+        }
+
+        .btn.g {
+            background: var(--card);
+            color: var(--tx);
+            border: 1px solid var(--line)
+        }
+
+        .btn.ok {
+            background: var(--ok)
+        }
+
+        .btn.s {
+            padding: 5px 10px;
+            font-size: 12px
+        }
+
+        .row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap
+        }
+
+        .tw {
+            overflow-x: auto
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 620px
+        }
+
+        th {
+            color: var(--mut);
+            font-weight: 600;
+            font-size: 12px;
+            text-align: left;
+            padding: 8px 6px
+        }
+
+        td {
+            padding: 7px 6px;
+            border-top: 1px solid var(--line);
+            vertical-align: middle
+        }
+
+        td input {
+            min-width: 70px
+        }
+
+        .tot td {
+            font-weight: 700
+        }
+
+        .pill {
+            display: inline-block;
+            border-radius: 12px;
+            padding: 2px 10px;
+            font-size: 12px;
+            background: rgba(128, 128, 128, .18)
+        }
+
+        .pill.ok {
+            color: var(--ok);
+            background: rgba(63, 157, 104, .16)
+        }
+
+        .pill.bad {
+            color: var(--bad);
+            background: rgba(212, 98, 62, .16)
+        }
+
+        .pill.warn {
+            color: var(--warn);
+            background: rgba(217, 164, 65, .16)
+        }
+
+        .months {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 16px
+        }
+
+        .months button {
+            background: var(--card);
+            color: var(--tx);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 8px 14px;
+            font: 600 13px inherit;
+            font-family: inherit;
+            cursor: pointer
+        }
+
+        .months .on {
+            background: var(--ok);
+            border-color: var(--ok);
+            color: #fff
+        }
+
+        .link {
+            color: var(--acc);
+            background: none;
+            border: 0;
+            font: 600 13px inherit;
+            font-family: inherit;
+            cursor: pointer;
+            padding: 6px 0
+        }
+
+        .note,
+        .fn {
+            color: var(--mut);
+            font-size: 12px;
+            margin-top: 8px
+        }
+
+        .alert {
+            background: rgba(212, 98, 62, .14);
+            color: var(--bad);
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin-bottom: 14px
+        }
+
+        #toast {
+            position: fixed;
+            bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--ok);
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: 8px;
+            display: none;
+            z-index: 9
+        }
+
+        .stat {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 14px;
+            margin-bottom: 18px
+        }
+
+        .stat div {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 16px
+        }
+
+        .stat b {
+            display: block;
+            font-size: 22px;
+            margin-top: 4px
+        }
+
+        @media (max-width:800px) {
+            .app {
+                grid-template-columns: 1fr
+            }
+
+            aside {
+                padding: 12px
+            }
+
+            nav {
+                display: flex;
+                overflow-x: auto;
+                gap: 4px
+            }
+
+            nav button {
+                white-space: nowrap;
+                width: auto
+            }
+
+            .who {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                margin-top: 10px;
+                padding-top: 10px;
+            }
+
+            .who-actions {
+                width: auto;
+            }
+
+            .btn-logout {
+                width: auto;
+                padding: 5px 12px;
+            }
+
+            main {
+                padding: 18px 14px
+            }
+        }
+
+        @media print {
+
+            aside,
+            .btn,
+            .link,
+            .top,
+            .note,
+            .noprint {
+                display: none !important
+            }
+
+            .pg {
+                page-break-after: always
+            }
+
+            .doc th,
+            .doc td {
+                padding: 4px 3px;
+                font-size: 11px
+            }
+
+            .app {
+                display: block
+            }
+
+            html,
+            body,
+            .card {
+                background: #fff !important;
+                color: #000 !important;
+                border: 0
+            }
+
+            th,
+            td {
+                color: #000 !important;
+                border-color: #bbb !important
+            }
+
+            .doc table {
+                min-width: 0
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Embedded Login View (displayed if not authenticated) -->
+    <div id="loginScreen" class="auth-view" style="display:none">
+        <div class="auth-container">
+            <div class="brand-header">
+                <div class="logo">UniBio Purchase<i>.</i></div>
+                <div class="sub-brand">Unibio India Hatcheries Pvt Ltd</div>
+                <div class="pill" style="margin-top:8px">ERP &bull; Material &amp; Purchase Portal</div>
+            </div>
+
+            <div class="auth-card">
+                <h2>Account Sign In</h2>
+                <p class="auth-desc">Log in to create POs, record GRNs, and view stock registers</p>
+
+                <div id="appLoginMsg" class="msg-banner"></div>
+
+                <form onsubmit="handleAppLogin(event)">
+                    <div class="f" style="margin-bottom:14px">
+                        <span>Username or Email</span>
+                        <div class="input-wrap">
+                            <input type="text" id="appUsername" placeholder="e.g. admin, manager, purchase" required autocomplete="username">
+                        </div>
+                    </div>
+
+                    <div class="f" style="margin-bottom:14px">
+                        <span>Password</span>
+                        <div class="input-wrap">
+                            <input type="password" id="appPassword" placeholder="Enter password" required autocomplete="current-password">
+                            <button type="button" class="pw-toggle" onclick="toggleAppPassword()" aria-label="Toggle password visibility">
+                                <span id="appPwToggleText">Show</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="f" style="margin-bottom:14px">
+                        <span>Assigned Site / Facility</span>
+                        <div class="input-wrap">
+                            <select id="appSite">
+                                <option value="Unibio (India) Hatcheries Pvt Ltd">Unibio (India) Hatcheries Pvt Ltd</option>
+                                <option value="Unit 2">Unit 2</option>
+                                <option value="MKM-OS">MKM-OS</option>
+                                <option value="NLR-OS">NLR-OS</option>
+                                <option value="KKD-OS">KKD-OS</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row-options">
+                        <label class="remember-wrap">
+                            <input type="checkbox" id="appRememberMe" checked>
+                            <span>Keep me signed in</span>
+                        </label>
+                        <span style="color:var(--mut); font-size:11px;">Default: <code style="color:var(--acc);">password123</code></span>
+                    </div>
+
+                    <button type="submit" id="appSubmitBtn" class="btn-submit">
+                        <span>Sign In</span>
+                        <span style="font-size:16px">&rarr;</span>
+                    </button>
+                </form>
+
+                <div class="demo-section">
+                    <div class="demo-title">
+                        <span>1-Click Demo Accounts</span>
+                        <span>Click to fill</span>
+                    </div>
+                    <div class="demo-grid">
+                        <button type="button" class="demo-btn" onclick="fillAppDemo('admin')">
+                            <span class="demo-role">&#128081; Management</span>
+                            <span class="demo-name">Director / Admin</span>
+                        </button>
+                        <button type="button" class="demo-btn" onclick="fillAppDemo('manager')">
+                            <span class="demo-role">&#128300; Manager</span>
+                            <span class="demo-name">Dr. K. Ramesh</span>
+                        </button>
+                        <button type="button" class="demo-btn" onclick="fillAppDemo('purchase')">
+                            <span class="demo-role">&#128722; Purchase</span>
+                            <span class="demo-name">S. Arun (Exec)</span>
+                        </button>
+                        <button type="button" class="demo-btn" onclick="fillAppDemo('store')">
+                            <span class="demo-role">&#128230; Stores</span>
+                            <span class="demo-name">M. Suresh</span>
+                        </button>
+                        <button type="button" class="demo-btn" onclick="fillAppDemo('accounts')">
+                            <span class="demo-role">&#128202; Accounts</span>
+                            <span class="demo-name">P. Lakshmi</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div style="margin-top:16px; text-align:center">
+                    <a href="login.html" class="link" style="font-size:12px">&rarr; Open Standalone Login Page</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app" id="app">
+        <aside>
+            <div class="logo">UniBio Purchase<i>.</i></div>
+            <nav id="nav"></nav>
+            <div class="who" id="who"></div>
+        </aside>
+        <main id="main"></main>
+    </div>
+    <div id="toast"></div>
+    <script>
+        const KEY = "unibio_purchase_v2", pad = n => String(n).padStart(3, "0"), inr = n => "₹" + Number(n || 0).toLocaleString("en-IN"), today = () => new Date().toISOString().slice(0, 10);
+        const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+        /* ---------- Authentication & Session ---------- */
+        const AUTH_KEY = "unibio_auth_user";
+        const USERS = [
+            { username: "admin", password: "password123", name: "Management Director", role: "Management", site: "Unibio (India) Hatcheries Pvt Ltd", email: "management@unibio.in" },
+            { username: "manager", password: "password123", name: "Dr. K. Ramesh", role: "Hatchery Manager", site: "Unibio (India) Hatcheries Pvt Ltd", email: "k.ramesh@unibio.in" },
+            { username: "purchase", password: "password123", name: "S. Arun", role: "Purchase Executive", site: "Unibio (India) Hatcheries Pvt Ltd", email: "arun.purchase@unibio.in" },
+            { username: "store", password: "password123", name: "M. Suresh", role: "Store In-charge", site: "Unit 2", email: "suresh.stores@unibio.in" },
+            { username: "accounts", password: "password123", name: "P. Lakshmi", role: "Accounts Officer", site: "Unibio (India) Hatcheries Pvt Ltd", email: "lakshmi.acc@unibio.in" }
+        ];
+
+        let currentUser = null;
+
+        function getAuthUser() {
+            try {
+                return JSON.parse(localStorage.getItem(AUTH_KEY) || sessionStorage.getItem(AUTH_KEY));
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function setAuthUser(user, remember = true) {
+            if (remember) {
+                localStorage.setItem(AUTH_KEY, JSON.stringify(user));
+                sessionStorage.removeItem(AUTH_KEY);
+            } else {
+                sessionStorage.setItem(AUTH_KEY, JSON.stringify(user));
+                localStorage.removeItem(AUTH_KEY);
+            }
+            currentUser = user;
+        }
+
+        function logout() {
+            localStorage.removeItem(AUTH_KEY);
+            sessionStorage.removeItem(AUTH_KEY);
+            currentUser = null;
+            toast("Signed out successfully");
+            checkAuthAndDisplay();
+        }
+
+        function getInitials(name) {
+            if (!name) return "UB";
+            const parts = name.replace(/Dr\.|Mr\.|Mrs\.|Ms\./gi, "").trim().split(/\s+/);
+            if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+            return name.slice(0, 2).toUpperCase();
+        }
+
+        function renderWho() {
+            const el = document.getElementById("who");
+            if (!el || !currentUser) return;
+            const init = getInitials(currentUser.name);
+            el.innerHTML = `
+                <div class="who-card">
+                    <div class="who-avatar" title="${esc(currentUser.name)}">${init}</div>
+                    <div class="who-details">
+                        <div class="who-name">${esc(currentUser.name)}</div>
+                        <div class="who-role">${esc(currentUser.role || "Staff")}</div>
+                        <div class="who-site" title="${esc(currentUser.site)}">${esc(currentUser.site)}</div>
+                    </div>
+                </div>
+                <div class="who-actions">
+                    <button class="btn-logout" onclick="logout()" title="Sign out of system">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                            <polyline points="16 17 21 12 16 7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                        <span>Sign Out</span>
+                    </button>
+                </div>
+            `;
+        }
+
+        function toggleAppPassword() {
+            const pw = document.getElementById("appPassword");
+            const btn = document.getElementById("appPwToggleText");
+            if (pw.type === "password") {
+                pw.type = "text";
+                btn.textContent = "Hide";
+            } else {
+                pw.type = "password";
+                btn.textContent = "Show";
+            }
+        }
+
+        function showAppLoginMsg(type, text) {
+            const box = document.getElementById("appLoginMsg");
+            if (!box) return;
+            box.className = "msg-banner " + type;
+            box.textContent = text;
+            box.style.display = "block";
+        }
+
+        function fillAppDemo(key) {
+            const u = USERS.find(x => x.username === key);
+            if (!u) return;
+            document.getElementById("appUsername").value = u.username;
+            document.getElementById("appPassword").value = u.password;
+            document.getElementById("appSite").value = u.site;
+            showAppLoginMsg("info", `Selected ${u.role}: ${u.name}. Click 'Sign In' or hit Enter.`);
+            document.getElementById("appPassword").focus();
+        }
+
+        function handleAppLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById("appUsername").value.trim().toLowerCase();
+            const password = document.getElementById("appPassword").value;
+            const site = document.getElementById("appSite").value;
+            const remember = document.getElementById("appRememberMe").checked;
+            const submitBtn = document.getElementById("appSubmitBtn");
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<span>Verifying...</span>`;
+
+            setTimeout(() => {
+                let matched = USERS.find(u => u.username.toLowerCase() === username || u.email.toLowerCase() === username);
+                if (matched) {
+                    if (matched.password !== password) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = `<span>Sign In &rarr;</span>`;
+                        showAppLoginMsg("error", "Incorrect password. Default demo password is password123");
+                        return;
+                    }
+                } else {
+                    if (password === "password123" || password.length >= 4) {
+                        matched = {
+                            username: username,
+                            name: username.charAt(0).toUpperCase() + username.slice(1),
+                            role: "Staff Member",
+                            site: site,
+                            email: username + "@unibio.in"
+                        };
+                    } else {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = `<span>Sign In &rarr;</span>`;
+                        showAppLoginMsg("error", "User not found or password too short (min 4 chars). Use demo logins below.");
+                        return;
+                    }
+                }
+
+                const authData = {
+                    ...matched,
+                    site: site || matched.site,
+                    loginTime: new Date().toISOString()
+                };
+
+                setAuthUser(authData, remember);
+                toast(`Welcome back, ${authData.name}`);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<span>Sign In &rarr;</span>`;
+                checkAuthAndDisplay();
+            }, 250);
+        }
+
+        function checkAuthAndDisplay() {
+            currentUser = getAuthUser();
+            const appEl = document.getElementById("app");
+            const loginEl = document.getElementById("loginScreen");
+
+            if (!currentUser) {
+                if (appEl) appEl.style.display = "none";
+                if (loginEl) loginEl.style.display = "flex";
+                return false;
+            } else {
+                if (loginEl) loginEl.style.display = "none";
+                if (appEl) appEl.style.display = "grid";
+                if (currentUser.site && SITEN.includes(currentUser.site)) {
+                    SS = currentUser.site;
+                }
+                renderWho();
+                render();
+                return true;
+            }
+        }
+        const PR = { "Unibio": { "Southern India": [["Frozen Squid", "1 kg", 682.0], ["Krill", "1 kg", 577.5], ["Vitamin C", "1 kg", 1770.0]], "I & V Bio India Pvt Ltd": [["Artemia", "1 kg", 2300.0]], "Amiti Bluetech Solutions": [["Am Garcin", "1 kg", 1500.0], ["Polychaetes", "1 kg", 6000.0]], "Aqua World": [["Astaxanthine", "500 g", 5900.0], ["Bectodine", "1 litre", 275.0], ["ET 600", "100 g", 2200.0], ["L Taurine", "1 kg", 3600.0], ["Mineral Mix", "1 kg", 1000.0], ["Paprika Powder", "454 g", 700.0], ["Refractometer", "Nos", 2500.0], ["Treflan", "100 ml", 500.0]], "Vitamax": [], "RRR Aqua Needs": [["Sea Fresh", "10 kg", 3398.0], ["Uniclear", "20 liter", 3996.0]], "Epicin D": [], "Laashi Exports Limited": [["1 Car", "500 g", 3430.0], ["2 CD", "500 g", 3430.0], ["3 CD", "500 g", 3260.0], ["CID", "500 g", 2400.0], ["FIT", "500 g", 3500.0], ["Lansy Shrimp Flake 150", "1 kg", 2200.0], ["MIC", "500 g", 8200.0], ["PL 150", "1 kg", 2610.0], ["PL 300", "1 kg", 2610.0], ["Pro 2", "500 g", 2200.0], ["Pro Tab", "500 g", 2385.0], ["Pro W", "500 g", 2800.0], ["RW 400", "1 kg", 2110.0], ["Sano 2/5", "1 kg", 2225.0], ["Sano 5/8", "1 kg", 1400.0], ["Squid", "1 kg", 546.0], ["EG Artemia Orange", "425 g", 2725.0], ["Separt Artemia", "425 g", 2725.0]], "Priyanka Enterprises": [["EZ Artemia 1", "1 kg", 4000.0], ["EZ Artemia 2", "1 kg", 3800.0], ["EZ Larva 1", "1 kg", 5250.0], ["EZ Larva 2", "1 kg", 5050.0], ["EZ Larva 3", "1 kg", 4250.0], ["Flake", "10 kg", 17000.0], ["Krill", "1 kg", 551.25], ["Larva z Plus 100-150", "1 Nos", 2400.0], ["MP2", "1 kg", NaN], ["MP3", "1 kg", 2650.0], ["MP4", "1 kg", 2650.0], ["Redimate", "15 kg", 45000.0], ["Rescue Probiotics", "500 g", 3125.0], ["Scallops", "1 kg", 1890.0], ["Summit Artemia", "425 g", 2913.75], ["Treflan", "100 ml", 1200.0], ["Z pro 150", "500 g", 1750.0], ["Z pro 250", "500 g", 1175.0], ["Z pro 350", "500 g", 1025.0]], "ABE / Aquabios Enterprises": [["Bectocell 10", "500g", 3920.0], ["Biogen", "500g", 2800.0], ["Decazyme", "500 g", 2500.0], ["Epilite Mysis", "1 litre", 3600.0], ["Epilite Zoea", "1 litre", 3700.0], ["OSI Spirulina", "500g", 2800.0], ["Pro Tab", "1 kg", 5000.0], ["Sya Aqua Mysis", "425 g", 3200.0], ["Sya Aqua Zoea", "425 g", 3300.0], ["Vitamin C", "1 kg", 1770.0], ["Vitaminium", "500 g", 2500.0], ["VT 600", "100 g", 1000.0], ["Zeigler Spirulina", "500g", 2600.0]], "Epicin Hatchery": [], "Rhia Scientific Concerns": [["Calcium Hypochlorite 65%", "1 kg", 283.2], ["Calcium Oxide", "1 kg", 218.0], ["Calcon Carboxylic Acid", "1 g", 160.0], ["Chromogenic Agar", "500 g", 15576.0], ["Cupric Sulphate", "500 g", 925.0], ["Cyanacobalamine", "1 g", 2908.7], ["D biotin", "1 g", 998.28], ["Demineral Water", "1 litre", 407.0], ["EDTA - Commercial", "1 kg", 101.0], ["EDTA - LR", "1 kg", 814.2], ["Ethanol", "500 Ml", 879.1], ["Ferric Chloride", "500 g", 429.5], ["Formalin - LR", "5 litre", 1633.12], ["Hydrochloric Acid", "1 litre", 15.3], ["Hypochlorine", "1 litre", 25.96], ["Iodophpur", "1 litre", 704.46], ["Lactophenol Cotton Blue solutions", "1 Nos", 430.0], ["Malachite Green Dye", "1 Nos", 212.0], ["Manganese Chloride", "500 g", 1046.6], ["Methyl Orange", "125 ml", 379.96], ["O-Tolidine", "500 ml", 418.9], ["Peptone Yeast Glucose Agar-500g", "1 Nos", 6658.0], ["Phenol", "500 g", 1330.0], ["Phenolphthalein", "125 ml", 324.5], ["Potassium hydroxide pellets", "1 kg", 2254.0], ["Potassium Permanganate", "1 kg", 575.84], ["Sabouraud dextrose agar", "1 Nos", 6402.0], ["Soap Oil", "1 litre", 50.74], ["Sodium Bicarbonate - Commercial", "1 kg", 91.0], ["Sodium Bicarbonate - LR", "1 kg", 849.6], ["Sodium dihydrogen ortho phosphate", "500 g", 1115.1], ["Sodium Hypochlorite", "1 litre", 1351.0], ["Sodium Nitrate", "1 kg", 1746.4], ["Sodium Silicate", "1 kg", 759.92], ["Sulphuric acid", "500 ml", 300.0], ["TCBS Agar", "500 g", 6949.02], ["Thiamine Hydrochloride", "25 g", 998.28], ["Trizol", "1 Nos", 2537.0]], "Arunachala Enterprises": [["Red pepper Enrichment", "1 litre", 4463.0], ["Royal Cavier 100-200", "1 kg", 6723.6], ["Royal Cavier 5-50", "400 g", 3320.0], ["Royal Cavier 50-100", "400 g", 3007.0], ["Royal pepper Protein", "1 litre", 3434.0]], "Marine Leader India": [["Choline Chloride", "500 g", 1250.0], ["Novobiotics", "500 ml", 4500.0], ["Vitamin C", "1 kg", 708.0]], "Arudra Bio Tech": [["Rubber Band", "1 kg", 399.0]], "GK": [], "Printed Packing Cover": [], "Plain Packing Cover": [] }, "Unit 2": { "Southern India": [["Frozen Squid", "1 kg", 682.0], ["Krill", "1 kg", 577.5], ["Vitamin C", "1 kg", 1770.0]], "I & V Bio India Pvt Ltd": [["Artemia", "1 kg", 2300.0]], "Amiti Bluetech Solutions": [["Polychaetes", "1 kg", 6000.0]], "Aqua World": [["Astaxanthine", "500 g", 5900.0], ["Bectodine", "1 litre", 275.0], ["Cod Liver oil", "1 litre", 700.0], ["ET 600", "100 g", 2200.0], ["L Taurine", "1 kg", 3600.0], ["Mineral Mix", "1 kg", 1000.0], ["Paprika Powder", "454 g", 700.0], ["Refractometer", "Nos", 2500.0], ["Treflan", "100 ml", 500.0], ["Vitamax", "1 kg", 4200.0], ["Vitamin A", "500 g", 3400.0], ["Yeast", "500 g", 4200.0]], "RRR Aqua Needs": [["Calcium Chloride", "5 kg", 1073.0], ["Magnesium Chloride", "5 kg", 1073.0], ["Sea Fresh", "10 kg", 3398.0], ["Uniclear", "20 liter", 3996.0]], "Laashi Exports Limited": [["1 Car", "500 g", 3430.0], ["2 CD", "500 g", 3430.0], ["3 CD", "500 g", 3260.0], ["CID", "500 g", 2400.0], ["FIT", "500 g", 3500.0], ["Lansy Shrimp Flake 150", "1 kg", 2200.0], ["MIC", "500 g", 8200.0], ["PL 150", "1 kg", 2750.0], ["PL 300", "1 kg", 2750.0], ["Pro 2", "500 g", 2200.0], ["Pro W", "500 g", 2800.0], ["RW 400", "1 kg", 2110.0], ["Sano 2/5", "1 kg", 2225.0], ["Sano 5/8", "1 kg", 1400.0], ["Squid", "1 kg", 546.0]], "Priyanka Enterprises": [["EZ Artemia 1", "1 kg", 4000.0], ["EZ Artemia 2", "1 kg", 3800.0], ["EZ Larva 1", "1 kg", 5000.0], ["EZ Larva 2", "1 kg", 5050.0], ["EZ Larva 3", "1 kg", 4250.0], ["Flake", "10 kg", 17000.0], ["Krill", "1 kg", 551.25], ["Larva z Plus 100-150", "1 Nos", 2400.0], ["MP3", "1 kg", 2650.0], ["MP4", "1 kg", 2650.0], ["Redimate", "15 kg", 45000.0], ["Rescue Probiotics", "500 g", 3125.0], ["Scallops", "1 kg", 1890.0], ["Skeletonema", "500 g", 17500.0], ["Summit Artemia", "425 g", 2913.75], ["Treflan", "100 ml", 1200.0], ["Z Plus 100 - 150", "1 kg", 2700.0], ["Z pro 150", "500 g", 1750.0], ["Z pro 250", "500 g", 1175.0], ["Z pro 350", "500 g", 1025.0]], "ABE / Aquabios Enterprises": [["Bectocell 10", "500g", 3920.0], ["Bectocell 100", "500g", 19500.0], ["Biogen", "500g", 2800.0], ["Boterasu", "1 kg", 5500.0], ["Decazyme", "500 g", 2500.0], ["Epicin D", "1 kg", 6000.0], ["Epicin Hatchery", "1 kg", 2000.0], ["Epilite Mysis", "1 litre", 3600.0], ["Epilite Zoea", "1 litre", 3700.0], ["Gasonex", "1 kg", 2619.0], ["MRM 500 - 800", "5 kg", 7125.0], ["OSI Spirulina", "500g", 2800.0], ["Pro Tab", "1 kg", 5000.0], ["Sya Aqua Mysis", "425 g", 3200.0], ["Sya Aqua Zoea", "425 g", 3300.0], ["Vibrio Shield Ultra", "500 g", 3750.0], ["Vitamin C", "1 kg", 1770.0], ["Vitaminium", "500 g", 2500.0], ["VT 600", "100 g", 1000.0], ["Wean 300 - 500", "5 kg", 4750.0], ["Wean 500 - 800", "5 kg", 4275.0], ["Zeigler Spirulina", "500g", 2600.0]], "Rhia Scientific Concerns": [["Calcium Hypochlorite 65%", "1 kg", 283.2], ["Calcium Oxide", "1 kg", 218.0], ["Calcon Carboxylic Acid", "1 g", 160.0], ["Chromogenic Agar", "500 g", 15576.0], ["Cupric Sulphate", "500 g", 925.0], ["Cyanacobalamine", "1 g", 2908.7], ["D biotin", "1 g", 998.28], ["Demineral Water", "1 litre", 407.0], ["DL Malic Acid", "500 g", 1374.7], ["EDTA - Commercial", "1 kg", 101.0], ["EDTA - LR", "1 kg", 814.2], ["Ethanol", "500 Ml", 879.1], ["Ferric Chloride", "500 g", 429.5], ["Formalin - LR", "5 litre", 1633.12], ["Formalin Commercial", "1 litre", 79.0], ["Hydrochloric Acid", "1 litre", 15.3], ["Hypochlorine", "1 litre", 25.96], ["Iodophpur", "1 litre", 704.46], ["Lactophenol Cotton Blue solutions", "1 Nos", 430.0], ["Malachite Green Dye", "1 Nos", 212.0], ["Manganese Chloride", "500 g", 1046.6], ["Methyl Orange", "125 ml", 379.96], ["O-Tolidine", "500 ml", 418.9], ["Peptone Yeast Glucose Agar-500g", "1 Nos", 6658.0], ["Phenol", "500 g", 1330.0], ["Phenolphthalein", "125 ml", 324.5], ["Potassium hydroxide pellets", "1 kg", 204.0], ["Potassium Permanganate", "1 kg", 575.84], ["Sabouraud dextrose agar", "1 Nos", 6402.0], ["Soap Oil", "1 litre", 50.74], ["Sodium Bicarbonate - Commercial", "1 kg", 91.0], ["Sodium Bicarbonate - LR", "1 kg", 849.6], ["Sodium Chloride", "500 g", 816.56], ["Sodium dihydrogen ortho phosphate", "500 g", 1115.1], ["Sodium Hypochlorite", "1 litre", 1351.0], ["Sodium Molibrate", "100 g", 430.0], ["Sodium Nitrate", "1 kg", 1746.4], ["Sodium Silicate", "1 kg", 759.92], ["Sodium Succinate", "100 g", 418.9], ["Sulphuric acid", "500 ml", 300.0], ["TCBS Agar", "500 g", 6949.02], ["Thiamine Hydrochloride", "25 g", 998.28], ["Trizol", "1 Nos", 2537.0]], "Arunachala Enterprises": [["Red pepper Enrichment", "1 litre", 4463.0], ["Royal Cavier 100-200", "1 kg", 6723.6], ["Royal Cavier 5-50", "400 g", 3320.0], ["Royal Cavier 50-100", "400 g", 3007.0], ["Royal pepper Protein", "1 litre", 3434.0]], "R L Aqua": [["Nannochloropsis Paste", "500 Litre", 2200.0], ["Shrimp Larval Feed Mysis", "500 g", 3100.0], ["Shrimp Larval Feed PL 150", "5 Kg", 10500.0], ["Shrimp Larval Feed PL 300", "5 Kg", 10500.0], ["Shrimp Larval Feed Zoea", "500 g", 3100.0]], "Gowri Biologicals": [["Elevia 3", "1 kg", 2350.0], ["Elevia 4", "1 kg", 1500.0]], "Novakem Bioscience": [["Lorica 1", "1 kg", 245.0], ["Lorica 2", "1 kg", 240.0]], "Marine Leader India": [["Cholestrol", "500 g", 1250.0], ["Choline Chloride", "500 g", 1250.0], ["Hydromac", "1 kg", 3500.0], ["Novobiotics", "500 ml", 4500.0], ["Spermax", "500 g", 5625.0], ["Vitamin C", "1 kg", 708.0], ["Yeast", "1 kg", 675.0]], "Arudra Bio Tech": [["Dailymin", "1 kg", 1750.0], ["Origin 300", "1 kg", 2950.0], ["Rubber Band", "1 kg", 399.0]] }, "MKM-OS": { "Southern India": [["Frozen Squid", "1 kg", 682.0], ["Krill", "1 kg", 577.5], ["Vitamin C", "1 kg", 1770.0]], "Amiti Bluetech Solutions": [["Polychaetes", "1 kg", 6000.0]], "Gayathri Bio Polytech Farm": [["Live Cultured Worms", "1 kg", 3000.0]], "Aqua World": [["Astaxanthine", "500g", 5900.0], ["Bectodine", "1 litre", 275.0], ["Cholestrol", "1 kg", 3000.0], ["Choline Chloride", "1 kg", 3250.0], ["Cod liver oil", "500 ml", 700.0], ["ET 600", "100 g", 2200.0], ["L Taurine", "1 kg", 3600.0], ["Mineral Mix", "1 kg", 1000.0], ["Paprika Powder", "454 g", 700.0], ["Protein Gel", "500 ml", 500.0], ["Soyalechithin", "500 ml", 500.0], ["Yeast", "1 kg", 600.0]], "RRR Aqua Needs": [["Sea Fresh", "10 kg", 3398.0], ["Uniclear", "20 liter", 3996.0]], "Laashi Exports Limited": [["Mussels", "1 kg", 1335.0], ["Pro 2", "500 g", 2200.0], ["Pro W", "500 g", 2800.0], ["Squid", "1 kg", 546.0]], "Priyanka Enterprises": [["Redimate", "15 kg", 45000.0], ["Scallops", "1 kg", 1890.0], ["Treflan", "100 ml", 1067.79]], "Rhia Scientific Concerns": [["Alam Powder", "1 kg", NaN], ["Ammonium Sulphate", "500 g", 571.0], ["Bleaching Powder", "1 kg", 36.8], ["Calcium Oxide", "1 kg", 218.0], ["Demineral Water", "1 litre", 407.0], ["Detergent Powder", "1 kg", 88.5], ["Dettol", "1 litre", 2519.0], ["EDTA - Commercial", "1 kg", 101.0], ["EDTA - LR", "1 kg", 814.2], ["Ethanol", "500 Ml", 879.1], ["Formalin - LR", "1 litre", 1633.12], ["Formalin -Commercial", "1 litre", 79.0], ["Hydrochloric Acid", "1 litre", 15.3], ["Hypochlorine", "1 litre", 25.96], ["Iodophpur", "1 litre", 704.46], ["O Tolidine", "500 ml", 418.9], ["Potassium Permanganate", "1 kg", 575.84], ["Soap Oil", "1 litre", 50.74], ["Sodium Bicarbonate - Commercial", "1 kg", 91.0], ["Sodium Bicarbonate - LR", "1 kg", 849.6], ["Sodium hydroxide pellets", "1 kg", 436.6], ["Vitamin C Commercial", "1 kg", NaN]], "Neeva Aero Solutions": [["Packing Cover", "Sac", 10500.0]], "K K Nag Private Limited": [["Thermocol", "Nos", 170.0]], "Arudra Bio Tech": [["Rubber Band", "1 kg", 399.0]] }, "NLR-OS": { "Southern India": [["Frozen Squid", "1 kg", 682.0], ["Krill", "1 kg", 577.5], ["Vitamin C", "1 kg", 1770.0]], "Amiti Bluetech Solutions": [["Polychaetes", "1 kg", 6000.0]], "Aqua World": [["Astaxanthine", "500g", 5900.0], ["Bectodine", "1 litre", 275.0], ["Cholestrol", "1 kg", 3000.0], ["Choline Chloride", "1 kg", 3250.0], ["Cod liver oil", "500 ml", 700.0], ["ET 600", "100 g", 2200.0], ["L Taurine", "1 kg", 3600.0], ["Mineral Mix", "1 kg", 1000.0], ["Paprika Powder", "454 g", 700.0], ["Protein Gel", "500 ml", 500.0], ["Soyalechithin", "500 ml", 500.0], ["Yeast", "1 kg", 600.0]], "Laashi Exports Limited": [["Mussels", "1 kg", 1335.0], ["Pro W", "500 g", 2800.0], ["Squid", "1 kg", 546.0]], "Priyanka Enterprises": [["Redimate", "15 kg", 45000.0], ["Scallops", "1 kg", 1890.0], ["Treflan", "100 ml", 1067.79]], "New Himalaya & Co": [["Ammonium Sulphate", "500 g", 354.0], ["Calcium Oxide", "1 kg", 212.4], ["Choline Chloride", "1 kg", 2832.0], ["Demineral Water", "1 litre", 82.6], ["EDTA - LR", "1 kg", 708.0], ["Ethanol", "500 Ml", 770.0], ["Formalin - LR", "1 litre", 200.6], ["Iodophpur", "1 litre", 566.4], ["O Tolidine", "500 ml", 472.0], ["Potassium Permanganate", "1 kg", 570.0], ["Sodium Bicarbonate - LR", "1 kg", 749.0], ["Sodium hydroxide pellets", "1 kg", 212.4], ["Sodium Thiosulphate", "1 kg", 236.0]], "Sri Balaji Chemicals": [["Bleaching Powder", "1 kg", 42.0], ["Dettol", "1 litre", 409.6], ["EDTA Commercial", "1 kg", 80.0], ["Formalin Commercial", "1 litre", 35.0], ["Hydrochloric Acid Commercial", "1 litre", 9.0], ["Hypochlorine Commercial", "1 litre", 15.0], ["Potassium Permanganate", "1 kg", 260.0], ["Seafresh", "1 kg", 227.0], ["Soap Oil", "1 litre", 47.2], ["Sodium Bicarbonate Commercial", "1 kg", 50.0], ["Surf", "1 kg", 60.0], ["Uniclear", "1 litre", 162.5]], "Neeva Aero Solutions": [["Packing Cover", "Sac", 10500.0]], "Shree Kanagadhurga Enterprises": [["Rubber Band", "1 kg", 399.0]] }, "KKD-OS": { "Southern India": [["Frozen Squid", "1 kg", 682.0], ["Krill", "1 kg", 577.5], ["Vitamin C", "1 kg", 1770.0]], "Amiti Bluetech Solutions": [["Polychaetes", "1 kg", 6000.0]], "Aqua Marine": [["Astaxanthine", "500g", 5900.0], ["Bectodine", "1 litre", 275.0], ["Cholestrol", "1 kg", 3000.0], ["Choline Chloride", "1 kg", 3250.0], ["Cod liver oil", "500 ml", 700.0], ["ET 600", "100 g", 2200.0], ["L Taurine", "1 kg", 3600.0], ["Mineral Mix", "1 kg", 1000.0], ["Paprika Powder", "454 g", 700.0], ["Protein Gel", "500 ml", 500.0], ["Soyalechithin", "500 ml", 500.0], ["Yeast", "1 kg", 600.0]], "Laashi Exports Limited": [["Mussels", "1 kg", 1335.0], ["Pro W", "500 g", 2800.0], ["Squid", "1 kg", 546.0]], "Priyanka Enterprises": [["Redimate", "15 kg", 45000.0], ["Scallops", "1 kg", 1890.0], ["Treflan", "100 ml", 1067.79]], "Associated Chemicals": [["Ammonium Sulphate", "500 g", 350.0], ["Bleaching Powder", "1 kg", 30.0], ["Calcium Oxide", "1 kg", 212.4], ["Choline Chloride", "1 kg", 2312.8], ["Demineral Water", "1 litre", 82.6], ["Dettol", "1 litre", 649.0], ["EDTA - LR", "1 kg", 640.0], ["EDTA Commercial", "1 kg", 280.0], ["Ethanol", "500 Ml", 413.0], ["Formalin - LR", "1 litre", 141.6], ["Formalin Commercial", "1 litre", 60.0], ["Hydrochloric Acid Commercial", "1 litre", 35.4], ["Hypochlorine Commercial", "1 litre", 35.4], ["Iodophpur", "1 litre", 472.0], ["O Tolidine", "500 ml", 360.0], ["Potassium Permanganate", "1 kg", 531.0], ["Seafresh", "10 kg", 3186.0], ["Soap Powder", "1 kg", 94.4], ["Sodium Bicarbonate - LR", "1 kg", 150.0], ["Sodium Bicarbonate Commercial", "1 kg", 64.9], ["Surf", "1 kg", 100.0], ["Uniclear", "20 litre", 3800.0]], "Rama Prasad Medicals": [["Povidone Iodine", "1 litre", 162.25]], "Venkateswara Lovaprasad Exports": [["Thermocol Box", "Nos", 171.0]], "Neeva Aero Solutions": [["Packing Cover", "Sac", 10500.0]], "Sambav Enterprises": [["Rubber Band", "1 kg", 399.0]] } };
+        const SEEDI = [["Alum Powder Commercial", 50, "Kg"], ["Hypo Chlorine - Commercial", 100, "Litre"], ["Bleaching Powder", 25, "Kg"], ["Formaldehyde (Commercial)", 30, "Litre"], ["Hydrocloric Acid- Commercial", 100, "Litre"], ["Iodophour", 10, "Litre"], ["Surf", 25, "Kg"], ["Sponge packets", 5, "Nos"]].map(a => ({ dept: "WATER SECTION", item: a[0], qty: a[1], unit: a[2], rate: 1 }));
+        const seed = () => ({
+            mv: [{ id: "MV1", type: "ISSUE", date: "2026-11-15", site: "Unibio (India) Hatcheries Pvt Ltd", item: "Surf", unit: "Kg", qty: -5, rate: 0, dept: "WATER SECTION", by: "Demo", note: "" }, { id: "MV2", type: "ISSUE", date: "2026-11-16", site: "Unibio (India) Hatcheries Pvt Ltd", item: "Bleaching Powder", unit: "Kg", qty: -3, rate: 0, dept: "WATER SECTION", by: "Demo", note: "" }], min: {}, lock: {}, cat: {}, vendors: [
+                { code: "VEN-01", name: "Aquabios Enterprises", pan: "BGJPM2050G", gst: "33BGJPM2050G1ZQ", contact: "9444835500 , 7558185566", email: "", state: "Tamil Nadu", country: "India", address: "No.2&3, Brigade Building", pincode: "", ok: 1 },
+                { code: "VEN-02", name: "Priyanka Enterprises - TN", pan: "AAEFP5791P", gst: "33AAEFP5791P1ZL", contact: "", email: "", state: "Tamil Nadu", country: "India", address: "", pincode: "", ok: 1 },
+                { code: "VEN-03", name: "Southern India Aquaculture", pan: "AAJPA0129K", gst: "33AAJPA0129K1Z6", contact: "28158935 , 28158936", email: "siacsiat@gmail.com", state: "Tamil Nadu", country: "India", address: "", pincode: "", ok: 1 },
+                { code: "VEN-04", name: "Lashi Export Limited", pan: "AAACL6785A", gst: "37AAACL6785A1Z1", contact: "9849553111", email: "", state: "Andhra Pradesh", country: "India", address: "", pincode: "", ok: 1 },
+                { code: "VEN-014", name: "Sri Balaji Traders", pan: "", gst: "", contact: "", email: "", state: "Tamil Nadu", country: "India", address: "", pincode: "", ok: 1 }],
+            pos: [{ id: "1633", date: "2026-11-13", site: "Unibio (India) Hatcheries Pvt Ltd", vendor: "Sri Balaji Chemicals", ship: "MAS Aqua Techniks - Nellore", status: "Approved", rev: 0, items: SEEDI },
+            { id: "1635", date: "2026-11-16", site: "Unibio (India) Hatcheries Pvt Ltd", vendor: "Priyanka Enterprises", ship: "Unibio (India) Hatcheries Pvt Ltd", status: "Pending", rev: 0, items: [{ dept: "WATER SECTION", item: "Plain Packing Cover", qty: 12, unit: "Nos", rate: 100 }] }],
+            grns: [{ id: "GRN-1633", po: "1633", date: "2026-11-14", by: "", items: SEEDI.map(i => ({ item: i.item, poq: i.qty, rec: i.qty, acc: i.qty, reason: "Delivered" })) }],
+            bills: [{ inv: "INV-9974", date: "2026-11-14", vendor: "Sri Balaji Chemicals", po: "1633", grn: "GRN-1633", by: "", tally: "TALLY-2026-013" }]
+        });
+        let S; try { S = JSON.parse(localStorage.getItem(KEY)) } catch (e) { } if (!S || !S.pos) S = seed(); if (!S.pr) S.pr = JSON.parse(JSON.stringify(PR)); if (!S.mv) S.mv = []; if (!S.min) S.min = {}; if (!S.lock) S.lock = {}; if (!S.cat) S.cat = {};
+        const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)) } catch (e) { } };
+        let cur = "po", sel = null, D = null, V = null, G = null, mon = null;
+        const pos = () => S.pos, po = id => S.pos.find(p => p.id === id), grn = id => S.grns.find(g => g.id === id), total = p => p.items.reduce((a, i) => a + i.qty * i.rate, 0);
+        const poGrn = id => S.grns.find(g => g.po === id), poBill = id => S.bills.find(b => b.po === id);
+        const pill = s => `<span class="pill ${s === "Approved" ? "ok" : s === "Rejected" ? "bad" : "warn"}">${esc(s)}</span>`;
+        function toast(t) { const e = document.getElementById("toast"); e.textContent = t; e.style.display = "block"; setTimeout(() => e.style.display = "none", 2200) }
+        const f = (l, i) => `<label class="f"><span>${l}</span>${i}</label>`;
+        const inp = (v, ex = "") => `<input value="${esc(v)}" ${ex}>`;
+        const pending = () => S.pos.filter(p => p.status === "Pending").length + S.vendors.filter(v => !v.ok && !v.rej).length;
+        const NAV = [["po", "Purchase Order (PO)"], ["grn", "Goods Receipt (GRN)"], ["grnl", "All GRNs"], ["bill", "Bill Entry"], ["status", "View PO Status"], ["tally", "Tally Entry"], ["recon", "Reconciliation"], ["stock", "Stock Register"], ["inout", "IN / OUT View"], ["sentry", "IN / OUT Entry"], ["mend", "Month-End Report"], ["pm", "Product Master"], ["vendors", "Vendor List"], ["appr", "Approvals Pending"]];
+        function go(v, s) { cur = v; sel = s || null; q = ""; stf = ""; if (v === "poe" && !s) D = blankPO(); if (v === "vendors") V = null; if (v === "grn") G = null; render() }
+
+        /* ---------- PO ---------- */
+        const SITES = [["Unibio", "Unibio (India) Hatcheries Pvt Ltd"], ["Unit 2", "Unit 2"], ["MKM-OS", "MKM-OS"], ["NLR-OS", "NLR-OS"], ["KKD-OS", "KKD-OS"]];
+        const SHIP = SITES.map(s => s[1]).concat("MAS Aqua Techniks - Nellore");
+        const siteKey = n => (SITES.find(s => s[1] === n) || [])[0];
+        const dmy = (d, s = "/") => d.split("-").reverse().join(s);
+        const blankRow = () => ({ dept: "WATER SECTION", item: "", qty: "", unit: "Kg", rate: 0 });
+        const blankPO = () => ({ id: null, date: today(), site: (currentUser && currentUser.site && SITEN.includes(currentUser.site) ? currentUser.site : SITES[0][1]), vendor: "", ship: (currentUser && currentUser.site && SITEN.includes(currentUser.site) ? currentUser.site : SITES[0][1]), items: [blankRow()] });
+        const prod = d => ((S.pr[siteKey(d.site)] || {})[d.vendor] || []);
+        const unitOf = p => { const m = (p || "").toLowerCase(); return /litre/.test(m) ? "Litre" : /ml/.test(m) ? "ml" : /kg/.test(m) ? "Kg" : /g\b/.test(m) ? "g" : "Nos" };
+        D = blankPO();
+        function poForm() {
+            const d = D, sup = Object.keys(S.pr[siteKey(d.site)] || {}), opt = (a, v) => a.map(x => `<option ${x === v ? "selected" : ""}>${esc(x)}</option>`).join("");
+            return `<div class="top"><div><h1>${d.id ? "Edit PO " + d.id : "Purchase Order Entry"}</h1><div class="sub">Prices come from the site and supplier price list; you can still edit them.</div></div><button class="btn ok" onclick="sendPO()">SAVE</button></div>
+<div class="card"><div class="grid">
+${f("Date", `<input type="date" value="${d.date}" oninput="D.date=this.value">`)}
+${f("Site", `<select onchange="D.site=this.value;D.vendor='';D.items=[blankRow()];render()">${opt(SITES.map(s => s[1]), d.site)}</select>`)}
+${f("Supplier", `<select onchange="D.vendor=this.value;D.items=[blankRow()];render()"><option value="">-- Select Supplier --</option>${opt(sup, d.vendor)}${d.vendor && !sup.includes(d.vendor) ? `<option selected>${esc(d.vendor)}</option>` : ""}</select>`)}
+${f("Shipping To", `<select onchange="D.ship=this.value">${opt(SHIP, d.ship)}</select>`)}</div></div>
+<div class="card"><div class="tw"><table><tr><th>Department</th><th>Product</th><th>Qty</th><th>Units</th><th>Unit Price</th><th>Total</th></tr>
+${d.items.map((it, i) => `<tr><td>${inp(it.dept, `oninput="D.items[${i}].dept=this.value"`)}</td><td><select onchange="pickP(${i},this.value)"><option value="">-- Product --</option>${it.item && !prod(d).some(p => p[0] === it.item) ? `<option value="" selected>${esc(it.item)}</option>` : ""}${prod(d).map((p, k) => `<option value="${k}" ${p[0] === it.item ? "selected" : ""}>${esc(p[0])} (${esc(p[1])})</option>`).join("")}</select></td><td><input type="number" min="0" value="${it.qty}" oninput="U(${i},'qty',+this.value)"></td><td><select onchange="U(${i},'unit',this.value)">${opt(["Kg", "g", "Litre", "ml", "Nos"], it.unit)}</select></td><td><input type="number" min="0" step="any" value="${it.rate}" oninput="U(${i},'rate',+this.value)"></td><td id="a${i}">${inr(it.qty * it.rate)}</td></tr>`).join("")}
+<tr class="tot"><td>Total</td><td></td><td></td><td></td><td></td><td id="tot">${inr(total(d))}</td></tr></table></div>
+<div class="row" style="margin-top:10px"><button class="btn g" onclick="D.items.push(blankRow());render()">+ Add Row</button><button class="btn g" onclick="if(D.items.length>1){D.items.pop();render()}">- Delete Row</button></div></div>`}
+        function U(i, k, v) { D.items[i][k] = v; const t = D.items[i]; document.getElementById("a" + i).textContent = inr(t.qty * t.rate); document.getElementById("tot").textContent = inr(total(D)) }
+        function pickP(i, k) { const p = prod(D)[k]; if (!p) return; D.items[i] = { ...D.items[i], item: p[0], unit: unitOf(p[1]), rate: p[2] }; render() }
+        function sendPO() {
+            if (!D.vendor) return toast("Select a supplier"); if (!D.items.every(i => i.item && i.qty > 0)) return toast("Choose product and quantity on every row");
+            if (D.id) { const p = po(D.id); Object.assign(p, JSON.parse(JSON.stringify(D)), { status: "Pending", rev: (p.rev || 0) + 1 }) }
+            else { const n = Math.max(1635, ...S.pos.map(p => +p.id || 0)) + 1; S.pos.push({ ...JSON.parse(JSON.stringify(D)), id: String(n), status: "Pending", rev: 0 }) }
+            save(); toast("PO saved and sent to Hatchery Manager for approval"); D = blankPO(); cur = "po"; mon = null; render()
+        }
+        function delPO(id) { if (poGrn(id)) return toast("This PO already has a GRN"); S.pos = S.pos.filter(p => p.id !== id); save(); render() }
+        function poList() {
+            initYM(); const rows = S.pos.filter(p => inYM(p.date) && mt(p) && (!stf || p.status === stf));
+            const val = rows.reduce((a, p) => a + total(p), 0), pend = rows.filter(p => p.status === "Pending").length, wait = rows.filter(p => p.status === "Approved" && !poGrn(p.id)).length;
+            return `<div class="top"><div><h1>All Purchase Orders</h1><div class="sub">${per()}</div></div><button class="btn" onclick="go('poe')">+ New PO</button></div>
+${monBar()}<div class="stat"><div>POs<b>${rows.length}</b></div><div>Total value<b>${inr(val)}</b></div><div>Pending approval<b>${pend}</b></div><div>Awaiting receipt<b>${wait}</b></div></div>
+${srch(`<select style="width:auto" onchange="stf=this.value;render()">${["", "Pending", "Approved", "Rejected"].map(x => `<option value="${x}" ${x === stf ? "selected" : ""}>${x || "All status"}</option>`).join("")}</select>`)}
+<div class="card"><div class="tw"><table><tr><th>SNO</th><th>PO NO.</th><th>Date</th><th>Site</th><th>Supplier</th><th>To Site</th><th>PO Amt</th><th>Status</th><th>Action</th></tr>
+${rows.slice().reverse().map((p, i) => `<tr><td>${i + 1}</td><td>${p.id}</td><td>${dmy(p.date)}</td><td>${esc(p.site)}</td><td>${esc(p.vendor)}</td><td>${esc(p.ship)}</td><td>${inr(total(p))}</td><td>${pill(p.status)}</td><td><div class="row"><button class="btn g s" onclick="go('pod','${p.id}')">View</button>${p.status === "Pending" ? `<button class="btn g s" onclick="D=JSON.parse(JSON.stringify(po('${p.id}')));cur='poe';render()">Edit</button>` : ""}${p.status === "Approved" && !poGrn(p.id) ? `<button class="btn ok s" onclick="recv('${p.id}')">Received</button>` : ""}<button class="btn g s" onclick="copyPO('${p.id}')">Copy</button><button class="btn g s" onclick="delPO('${p.id}')">Del</button><button class="btn g s" onclick="go('pod','${p.id}');setTimeout(()=>window.print(),250)">PDF</button></div></td></tr>`).join("") || `<tr><td colspan="9" class="note">No purchase orders in ${per()}.</td></tr>`}</table></div></div>`
+        }
+        function podView() {
+            const p = po(sel); if (!p) return go("po");
+            return `<div class="top"><div><h1>Purchase Order</h1><div class="sub">PO ${p.id} · ${p.status}${p.rev ? " · Rev " + p.rev : ""}</div></div><div class="row"><button class="btn g" onclick="D=JSON.parse(JSON.stringify(po('${p.id}')));cur='poe';render()">Revise</button><button class="btn" onclick="window.print()">Download PDF</button></div></div>
+<div class="card doc"><div style="text-align:center"><b>Unibio India Hatcheries Pvt Ltd</b><br>No.58/3, Mugaiyur Village, Cheyyur Taluk, Kanchipuram Dist., Tamil Nadu, India - 603306<br><br><b>Purchase Order</b></div>
+<div class="grid" style="margin:16px 0"><div><b>From</b><br>Unibio (India) Hatcheries Pvt Ltd<br>Mugaiyur Village, Cheyyur Taluk,<br>Chengalpattu Dt<br>Tamil Nadu - 603305<br>33AACCU0455E1ZS<br>8925774485</div><div>Date: ${dmy(p.date, "-")}<br>PO#: ${p.id}<br>Site: ${esc(p.site)}</div><div><b>To</b><br>${esc(p.vendor)}</div><div><b>Shipping To</b><br>${esc(p.ship)}</div></div>
+<div class="tw"><table><tr><th>SNo.</th><th>Product</th><th>Qty</th><th>Units</th><th>Unit Cost</th><th>Cost</th></tr>${p.items.map((i, k) => `<tr><td>${k + 1}</td><td>${esc(i.item)}</td><td>${Number(i.qty).toFixed(2)}</td><td>${esc(i.unit)}</td><td>${Number(i.rate).toFixed(2)}</td><td>${(i.qty * i.rate).toFixed(2)}</td></tr>`).join("")}<tr class="tot"><td></td><td>Total (Rs.)</td><td></td><td></td><td></td><td>${total(p).toFixed(2)}</td></tr></table></div>
+<div style="text-align:right;margin-top:24px">Unibio India Hatcheries Pvt Ltd<br><br><br>Seal &amp; Signature</div></div>`}
+
+        /* ---------- Approvals ---------- */
+        function apprView() {
+            const ps = S.pos.filter(p => p.status === "Pending"), vs = S.vendors.filter(v => !v.ok && !v.rej);
+            return `<div class="top"><div><h1>Pending Approvals</h1><div class="sub">Waiting for approval</div></div></div>` +
+                (ps.length ? ps.map(p => `<div class="card"><div class="alert">PO yet to be Approved</div><div class="grid">${[["PO date", dmy(p.date)], ["PO No", p.id], ["Site", p.site], ["Supplier", p.vendor], ["Ship To", p.ship]].map(x => f(x[0], inp(x[1], "disabled"))).join("")}</div>
+<div class="tw"><table><tr><th>Department</th><th>Product</th><th>Qty</th><th>Units</th><th>Unit Price</th><th>Amount</th></tr>${p.items.map(i => `<tr><td>${esc(i.dept)}</td><td>${esc(i.item)}</td><td>${i.qty}</td><td>${esc(i.unit)}</td><td>${i.rate}</td><td>${inr(i.qty * i.rate)}</td></tr>`).join("")}<tr class="tot"><td>Total</td><td></td><td></td><td></td><td></td><td>${inr(total(p))}</td></tr></table></div>
+<div class="row" style="justify-content:flex-end"><button class="btn ok" onclick="decide('po','${p.id}','Approved')">Approve</button><button class="btn g" onclick="decide('po','${p.id}','Rejected')">Reject</button></div></div>`).join("") : `<div class="card note">No POs waiting.</div>`) +
+                vs.map(v => `<div class="card"><div class="alert">Vendor yet to be Approved</div><div class="grid">${[["Vendor Code", v.code], ["Vendor Name", v.name], ["Address", v.address], ["State", v.state], ["Country", v.country], ["Pincode", v.pincode], ["PAN", v.pan], ["GST", v.gst]].map(x => f(x[0], inp(x[1], "disabled"))).join("")}</div><div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn ok" onclick="decide('v','${v.code}',1)">Approve</button><button class="btn g" onclick="decide('v','${v.code}',0)">Reject</button></div></div>`).join("")
+        }
+        function decide(t, id, r) { if (t === "po") po(id).status = r; else { const v = S.vendors.find(x => x.code === id); r ? v.ok = 1 : v.rej = 1 } save(); toast("Done"); render() }
+
+        /* ---------- GRN ---------- */
+        function grnView() {
+            const open = S.pos.filter(p => p.status === "Approved" && !poGrn(p.id));
+            if (!G) G = { po: open[0]?.id || "", date: today(), by: (currentUser ? currentUser.name : ""), items: [] };
+            if (G.po && !G.items.length && po(G.po)) G.items = po(G.po).items.map(i => ({ item: i.item, poq: i.qty, rec: i.qty, acc: i.qty, reason: "" }));
+            const p = po(G.po);
+            return `<div class="top"><div><h1>Goods Receipt Note</h1></div><button class="btn" onclick="sendGRN()">Submit GRN</button></div>
+<div class="card"><h3>Receipt details</h3><div class="grid">${f("GRN date", `<input type="date" value="${G.date}" oninput="G.date=this.value">`)}
+${f("PO reference", `<select onchange="G.po=this.value;G.items=[];render()"><option value="">Select approved PO</option>${open.map(o => `<option ${o.id === G.po ? "selected" : ""}>${o.id}</option>`).join("")}</select>`)}
+${f("Vendor", inp(p ? p.vendor : "", "readonly"))}${f("Received by", inp(G.by, `placeholder="Enter name" oninput="G.by=this.value"`))}</div></div>
+<div class="card"><h3>Line items</h3><div class="tw"><table><tr><th>Item</th><th>PO qty</th><th>Received</th><th>Accepted</th><th>Rejected</th><th>Reason</th></tr>
+${G.items.map((i, k) => `<tr><td>${esc(i.item)}</td><td>${i.poq}</td><td><input type="number" min="0" value="${i.rec}" oninput="GU(${k},'rec',+this.value)"></td><td><input type="number" min="0" value="${i.acc}" oninput="GU(${k},'acc',+this.value)"></td><td id="rj${k}">${i.rec - i.acc || ""}</td><td>${inp(i.reason, `oninput="G.items[${k}].reason=this.value"`)}</td></tr>`).join("") || `<tr><td colspan="6" class="note">${open.length ? "Select a PO" : "No approved PO is waiting for a GRN."}</td></tr>`}</table></div>
+<div class="note">Bill cannot be entered in Tally until this GRN is submitted.</div></div>`}
+        function GU(k, key, v) { G.items[k][key] = v; document.getElementById("rj" + k).textContent = G.items[k].rec - G.items[k].acc || "" }
+        function sendGRN() {
+            if (!G.po) return toast("Select a PO"); if (!G.by.trim()) return toast("Enter who received the goods"); if (G.items.some(i => i.acc > i.rec)) return toast("Accepted cannot exceed received"); const gp = po(G.po); if (gp && locked(G.date, stockSite(gp))) return toast("Stock month is approved and locked for this site");
+            if (G.items.some(i => i.rec > i.acc && !i.reason)) return toast("Give a reason for rejected qty");
+            S.grns.push({ id: "GRN-" + G.po, po: G.po, date: G.date, by: G.by, items: G.items }); save(); toast("GRN submitted"); G = null; cur = "grnl"; mon = null; render()
+        }
+        function grnDetail() {
+            const g = grn(sel); if (!g) return go("status");
+            return `<div class="top"><div><h1>Goods Receipt Note</h1><div class="sub">${g.id}</div></div><button class="btn" onclick="window.print()">Download Receipt</button></div>
+<div class="card"><div class="grid">${[["GRN date", g.date], ["PO reference", g.po], ["Vendor", po(g.po)?.vendor], ["Received by", g.by]].map(x => f(x[0], inp(x[1], "disabled"))).join("")}</div></div>
+<div class="card"><div class="tw"><table><tr><th>Item</th><th>PO qty</th><th>Received</th><th>Accepted</th><th>Rejected</th><th>Reason</th></tr>${g.items.map(i => `<tr><td>${esc(i.item)}</td><td>${i.poq}</td><td>${i.rec}</td><td>${i.acc}</td><td>${i.rec - i.acc || ""}</td><td>${esc(i.reason)}</td></tr>`).join("")}</table></div></div>`
+        }
+
+        /* ---------- Bill entry ---------- */
+        let B = { inv: "", date: today(), po: "", by: "" };
+        function billView() {
+            if (!B.by && currentUser) B.by = currentUser.name;
+            const ok = S.pos.filter(p => poGrn(p.id) && !poBill(p.id)), p = po(B.po);
+            return `<div class="top"><div><h1>Bill Entry Log</h1><div class="sub">Link the invoice hardcopy with its PO and GRN before couriering to the office.</div></div><div class="row"><button class="btn g" onclick="csv()">Export to Excel</button><button class="btn" onclick="sendBill()">Submit</button></div></div>
+<div class="card"><h3>Bill details</h3><div class="grid">${f("Invoice No", inp(B.inv, `oninput="B.inv=this.value"`))}${f("Invoice Date", `<input type="date" value="${B.date}" oninput="B.date=this.value">`)}
+${f("PO reference", `<select onchange="B.po=this.value;render()"><option value="">Select PO with GRN</option>${ok.map(o => `<option ${o.id === B.po ? "selected" : ""}>${o.id}</option>`).join("")}</select>`)}
+${f("Vendor", inp(p ? p.vendor : "", "readonly"))}${f("GRN reference", inp(p ? poGrn(p.id).id : "", "readonly"))}${f("Prepared by", inp(B.by, `placeholder="Enter name" oninput="B.by=this.value"`))}</div></div>
+<div class="card"><h3>Bills logged</h3><div class="tw"><table><tr><th>Invoice</th><th>Date</th><th>Vendor</th><th>PO</th><th>GRN</th><th>Prepared by</th></tr>${S.bills.map(b => `<tr><td>${esc(b.inv)}</td><td>${b.date}</td><td>${esc(b.vendor)}</td><td>${b.po}</td><td>${b.grn}</td><td>${esc(b.by)}</td></tr>`).join("")}</table></div></div>`
+        }
+        function sendBill() {
+            const p = po(B.po); if (!p) return toast("Select a PO"); if (!B.inv.trim()) return toast("Enter invoice no"); if (!B.by.trim()) return toast("Enter prepared by");
+            S.bills.push({ inv: B.inv.trim(), date: B.date, vendor: p.vendor, po: p.id, grn: poGrn(p.id).id, by: B.by, tally: "" }); save(); toast("Bill logged"); B = { inv: "", date: today(), po: "", by: B.by }; cur = "status"; mon = null; render()
+        }
+        function csv() {
+            const t = "Invoice,Date,Vendor,PO,GRN,Tally\n" + S.bills.map(b => [b.inv, b.date, b.vendor, b.po, b.grn, b.tally].join(",")).join("\n");
+            try { navigator.clipboard.writeText(t).then(() => toast("Table copied — paste into Excel"), () => toast("Copy blocked by browser")) } catch (e) { toast("Copy not available") }
+        }
+
+        /* ---------- Status ---------- */
+        const MN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        let yr = null, q = "", stf = "";
+        const years = () => [...new Set(S.pos.map(p => p.date.slice(0, 4)).concat(S.grns.map(g => g.date.slice(0, 4)), String(new Date().getFullYear())))].sort().reverse();
+        function initYM() { if (mon === null || yr === null) { const l = S.pos[S.pos.length - 1], d = l ? l.date : today(); yr = d.slice(0, 4); mon = +d.slice(5, 7) - 1 } }
+        const inYM = d => d.slice(0, 4) === yr && (mon < 0 || +d.slice(5, 7) - 1 === mon);
+        const monBar = () => `<div class="months"><select style="width:auto;font-weight:600" onchange="yr=this.value;render()">${years().map(y => `<option ${y === yr ? "selected" : ""}>${y}</option>`).join("")}</select><button class="${mon < 0 ? "on" : ""}" onclick="mon=-1;render()">All</button>${MN.map((m, i) => `<button class="${i === mon ? "on" : ""}" onclick="mon=${i};render()">${m}</button>`).join("")}</div>`;
+        const srch = (x = "") => `<div class="row" style="margin-bottom:14px"><input id="q" style="max-width:320px" placeholder="Search…" value="${esc(q)}" oninput="sq(this.value)">${x}</div>`;
+        function sq(v) { q = v; render(); const e = document.getElementById("q"); if (e) { e.focus(); e.setSelectionRange(v.length, v.length) } }
+        const hit = a => !q || a.join(" ").toLowerCase().includes(q.toLowerCase());
+        const mt = p => hit([p.id, p.vendor, p.site, p.ship, (poBill(p.id) || {}).inv || ""]);
+        const per = () => (mon < 0 ? "" : MN[mon] + " ") + yr;
+        function statusView() {
+            initYM(); const rows = S.pos.filter(p => inYM(p.date) && mt(p));
+            return `<div class="top"><div><h1>Purchase Status</h1><div class="sub">Current status of Purchase · ${per()}</div></div><button class="btn g" onclick="csv()">Export to Excel</button></div>
+${monBar()}${srch()}
+<div class="card"><h3>Bill matching</h3><div class="tw"><table><tr><th>Supplier</th><th>PO No</th><th>Status</th><th>GRN No</th><th>Status</th><th>Invoice</th><th>Invoice Date</th><th>Status</th><th>Tally Voucher No</th></tr>
+${rows.map(p => { const g = poGrn(p.id), b = poBill(p.id); return `<tr><td>${esc(p.vendor)}</td><td>${p.id} <button class="btn g s" onclick="go('pod','${p.id}')">View</button></td><td>${pill(p.status)}</td><td>${g ? g.id + ` <button class="btn g s" onclick="go('grnd','${g.id}')">View</button>` : "—"}</td><td>${g ? '<span class="pill ok">OK</span>' : ""}</td><td>${b ? esc(b.inv) : ""}</td><td>${b ? b.date : ""}</td><td>${b ? (b.tally ? '<span class="pill ok">Matched</span>' : '<span class="pill bad">Check</span>') : ""}</td><td>${b ? esc(b.tally) : ""}</td></tr>` }).join("") || `<tr><td colspan="9" class="note">No purchases in ${per()}.</td></tr>`}</table></div></div>`
+        }
+        function grnListView() {
+            initYM(); const rows = S.grns.filter(g => inYM(g.date) && hit([g.id, g.po, (po(g.po) || {}).vendor, g.by]));
+            const rej = rows.filter(g => g.items.some(i => i.rec > i.acc)).length, nb = rows.filter(g => !S.bills.some(b => b.grn === g.id)).length;
+            return `<div class="top"><div><h1>All GRNs</h1><div class="sub">Every goods receipt note · ${per()}</div></div><button class="btn" onclick="go('grn')">+ New GRN</button></div>
+${monBar()}<div class="stat"><div>GRNs<b>${rows.length}</b></div><div>With rejections<b>${rej}</b></div><div>Awaiting bill<b>${nb}</b></div></div>${srch()}
+<div class="card"><div class="tw"><table><tr><th>SNO</th><th>GRN No</th><th>Date</th><th>PO No</th><th>Supplier</th><th>Received By</th><th>Items</th><th>Rejected lines</th><th>Bill</th><th>Action</th></tr>
+${rows.slice().reverse().map((g, i) => { const b = S.bills.find(x => x.grn === g.id), r = g.items.filter(x => x.rec > x.acc).length; return `<tr><td>${i + 1}</td><td>${g.id}</td><td>${dmy(g.date)}</td><td>${g.po}</td><td>${esc((po(g.po) || {}).vendor)}</td><td>${esc(g.by) || "—"}</td><td>${g.items.length}</td><td>${r ? `<span class="pill bad">${r}</span>` : "0"}</td><td>${b ? esc(b.inv) : '<span class="pill warn">Awaiting bill</span>'}</td><td><div class="row"><button class="btn g s" onclick="go('grnd','${g.id}')">View</button><button class="btn g s" onclick="go('grnd','${g.id}');setTimeout(()=>window.print(),250)">Print</button></div></td></tr>` }).join("") || `<tr><td colspan="10" class="note">No GRNs in ${per()}.</td></tr>`}</table></div></div>`
+        }
+        function recv(id) { G = { po: id, date: today(), by: (currentUser ? currentUser.name : ""), items: [] }; cur = "grn"; render() }
+        function copyPO(id) { D = JSON.parse(JSON.stringify(po(id))); D.id = null; D.date = today(); delete D.status; delete D.rev; cur = "poe"; render() }
+
+        /* ---------- Tally & Recon ---------- */
+        function tallyView() {
+            return `<div class="top"><div><h1>Tally Entry</h1><div class="sub">Enter the Tally voucher for bills that have a GRN. Status turns to Matched.</div></div></div>
+<div class="card"><div class="tw"><table><tr><th>Invoice</th><th>Vendor</th><th>PO</th><th>GRN</th><th>Voucher No</th><th></th></tr>${S.bills.map((b, i) => `<tr><td>${esc(b.inv)}</td><td>${esc(b.vendor)}</td><td>${b.po}</td><td>${b.grn}</td><td>${b.tally ? esc(b.tally) : `<input id="tv${i}" placeholder="TALLY-2026-0xx">`}</td><td>${b.tally ? '<span class="pill ok">Matched</span>' : `<button class="btn s" onclick="saveTally(${i})">Save</button>`}</td></tr>`).join("") || `<tr><td colspan="6" class="note">No bills yet.</td></tr>`}</table></div></div>`
+        }
+        function saveTally(i) { const v = document.getElementById("tv" + i).value.trim(); if (!v) return toast("Enter voucher no"); S.bills[i].tally = v; save(); toast("Matched"); render() }
+        function reconView() {
+            let ordered = 0, accepted = 0, rej = 0; const lines = S.bills.map(b => { const p = po(b.po), g = grn(b.grn); const o = total(p), a = g.items.reduce((s, i, k) => s + i.acc * p.items[k].rate, 0); ordered += o; accepted += a; rej += o - a; return { b, o, a } });
+            const un = S.bills.filter(b => !b.tally).length;
+            return `<div class="top"><div><h1>Reconciliation</h1><div class="sub">PO value against accepted GRN value for billed orders</div></div></div>
+<div class="stat"><div>PO value<b>${inr(ordered)}</b></div><div>Accepted value<b>${inr(accepted)}</b></div><div>Credit note due<b>${inr(rej)}</b></div><div>Bills not in Tally<b>${un}</b></div></div>
+<div class="card"><div class="tw"><table><tr><th>Invoice</th><th>PO</th><th>PO value</th><th>Accepted value</th><th>Difference</th><th>Tally</th></tr>${lines.map(l => `<tr><td>${esc(l.b.inv)}</td><td>${l.b.po}</td><td>${inr(l.o)}</td><td>${inr(l.a)}</td><td>${l.o - l.a ? inr(l.o - l.a) : "—"}</td><td>${l.b.tally ? '<span class="pill ok">Matched</span>' : '<span class="pill bad">Check</span>'}</td></tr>`).join("")}</table></div><div class="note">A difference means rejected goods; ask the vendor for a credit note.</div></div>`
+        }
+
+        /* ---------- Product Master ---------- */
+        let PM = { site: SITES[0][1], sup: "", nsup: "", name: "", pack: "", price: "", flt: "" };
+        function pmView() {
+            const k = siteKey(PM.site), m = S.pr[k], sups = Object.keys(m), opt = (a, v) => a.map(x => `<option ${x === v ? "selected" : ""}>${esc(x)}</option>`).join("");
+            const rows = []; sups.forEach((su, si) => { if (PM.flt && PM.flt !== su) return; m[su].forEach((p, pi) => rows.push([si, pi, su, p])) });
+            return `<div class="top"><div><h1>Product Master</h1><div class="sub">Products and prices per site and supplier. These feed the PO entry form.</div></div></div>
+<div class="card"><h3>Add New Product</h3><div class="grid">
+${f("Site", `<select onchange="PM.site=this.value;PM.sup='';PM.flt='';render()">${opt(SITES.map(s => s[1]), PM.site)}</select>`)}
+${f("Supplier", `<select onchange="PM.sup=this.value;render()"><option value="">-- Select Supplier --</option>${opt(sups, PM.sup)}<option value="__new" ${PM.sup === "__new" ? "selected" : ""}>+ New supplier…</option></select>`)}
+${PM.sup === "__new" ? f("New supplier name", inp(PM.nsup, `oninput="PM.nsup=this.value"`)) : ""}
+${f("Product Name", inp(PM.name, `oninput="PM.name=this.value"`))}
+${f("Pack Size", inp(PM.pack, `placeholder="1 kg" oninput="PM.pack=this.value"`))}
+${f("Unit Price (₹)", `<input type="number" min="0" step="any" value="${PM.price}" oninput="PM.price=this.value">`)}</div>
+<div class="row" style="margin-top:14px"><button class="btn ok" onclick="pmAdd()">Add Product</button></div></div>
+<div class="card"><h3>Products at ${esc(PM.site)}</h3><div class="row" style="margin-bottom:12px"><select style="max-width:320px" onchange="PM.flt=this.value;render()"><option value="">All suppliers</option>${opt(sups, PM.flt)}</select></div>
+<div class="tw"><table><tr><th>Supplier</th><th>Product</th><th>Pack</th><th>Unit Price (₹)</th><th></th></tr>${rows.map(r => `<tr><td>${esc(r[2])}</td><td>${esc(r[3][0])}</td><td>${esc(r[3][1])}</td><td><input type="number" min="0" step="any" value="${r[3][2]}" onchange="pmPrice(${r[0]},${r[1]},+this.value)"></td><td><button class="btn g s" onclick="pmDel(${r[0]},${r[1]})">Del</button></td></tr>`).join("") || `<tr><td colspan="5" class="note">No products.</td></tr>`}</table></div><div class="note">Price edits apply to new POs only; existing POs keep the price they were created with.</div></div>`
+        }
+        function pmAdd() {
+            const m = S.pr[siteKey(PM.site)], su = PM.sup === "__new" ? PM.nsup.trim() : PM.sup, nm = PM.name.trim(), pk = PM.pack.trim();
+            if (!su) return toast("Choose or enter a supplier"); if (!nm) return toast("Enter product name"); if (!(+PM.price > 0)) return toast("Enter unit price");
+            const ex = m[su] || (m[su] = []); if (ex.some(p => p[0].toLowerCase() === nm.toLowerCase() && p[1] === pk)) return toast("Product already exists");
+            ex.push([nm, pk, +PM.price]); save(); toast("Product added"); PM = { ...PM, sup: su, nsup: "", name: "", pack: "", price: "" }; render()
+        }
+        function pmPrice(si, pi, v) { const m = S.pr[siteKey(PM.site)]; m[Object.keys(m)[si]][pi][2] = v; save(); toast("Price updated") }
+        function pmDel(si, pi) { const m = S.pr[siteKey(PM.site)]; m[Object.keys(m)[si]].splice(pi, 1); save(); render() }
+
+        /* ---------- Vendors ---------- */
+        const VF = [["code", "Vendor Code"], ["name", "Vendor Name"], ["address", "Address"], ["state", "State"], ["country", "Country"], ["pincode", "Pincode"], ["pan", "PAN No"], ["gst", "GST No"], ["email", "Email"], ["contact", "Contact No"]];
+        function vendView() {
+            if (V) return `<div class="top"><div><h1>${V.edit ? "Edit Vendor" : "Add New Vendor"}</h1><div class="sub">Fill in all the details</div></div><button class="btn" onclick="saveV()">${V.edit ? "Save" : "Send for Approval"}</button></div><div class="card"><h3>Vendor Details</h3><div class="grid">${VF.map(([k, l]) => f(l, inp(V[k], `oninput="V.${k}=this.value"`))).join("")}</div></div>`;
+            return `<div class="top"><div><h1>Vendor List</h1><div class="sub">Approved list of Vendors authorized by the Management</div></div><button class="btn" onclick="V={code:'VEN-'+String(S.vendors.length+1).padStart(2,'0'),name:'',address:'',state:'Tamil Nadu',country:'India',pincode:'',pan:'',gst:'',email:'',contact:''};render()">+ Add New Vendor</button></div>
+<div class="card"><h3>Active categories</h3><div class="tw"><table><tr><th>Code</th><th>Name</th><th>PAN</th><th>GST</th><th>Contact</th><th>Email</th><th>Status</th><th>Modify</th></tr>${S.vendors.map((v, i) => `<tr><td>${v.code}</td><td>${esc(v.name)}</td><td>${esc(v.pan)}</td><td>${esc(v.gst)}</td><td>${esc(v.contact)}</td><td>${esc(v.email)}</td><td>${v.ok ? '<span class="pill ok">Approved</span>' : v.rej ? '<span class="pill bad">Rejected</span>' : '<span class="pill warn">Pending</span>'}</td><td><button class="btn g s" onclick="V={...S.vendors[${i}],edit:${i + 1}};render()">Edit</button></td></tr>`).join("")}</table></div><div class="note">Management approval is mandatory to add a new Vendor</div></div>`
+        }
+        function saveV() {
+            if (!V.name.trim() || !V.code.trim()) return toast("Code and name are required"); const e = V.edit; delete V.edit;
+            if (e) { Object.assign(S.vendors[e - 1], V); toast("Vendor updated") } else { if (S.vendors.some(v => v.code === V.code)) return toast("Vendor code already exists"); S.vendors.push({ ...V, ok: 0 }); toast("Vendor sent to Hatchery Manager for approval") } save(); V = null; render()
+        }
+
+        /* ---------- Stock / Inventory ---------- */
+        const SITEN = SITES.map(s => s[1]), ORD = { OPEN: 0, IN: 1, ADJ: 2, ISSUE: 3 }, TL = { IN: "Received (IN)", OPEN: "Opening stock", ADJ: "Count adjustment", ISSUE: "Issued (OUT)" };
+        const CATS = ["Chemicals", "Disinfectants", "Fuel", "Lab items", "Larval Feeds", "Maturation feed", "Netting materials", "Others", "Probiotics", "Water conditioners"];
+        const CATRULES = [["Netting materials", /rubber band|packing cover|thermocol|netting|\bnet\b/], ["Fuel", /diesel|petrol|fuel/], ["Lab items", /\blr\b|agar|refractometer|trizol|peptone|dextrose|phenol|tolidine|orange|lactophenol|biotin|cyanacobalamine|thiamine|calcon|demineral|dihydrogen|molibrate|succinate|\bdye\b/], ["Probiotics", /probiotic|bectocell|biogen|decazyme|epicin|vibrio shield|rescue|gasonex|boterasu|novobiotics/], ["Disinfectants", /dettol|iodophpur|iodophour|iodine|bleaching|hypo ?chlor|formalin|formaldehyde|povidone|bectodine|treflan|malachite|ethanol|\bsurf\b|soap|detergent/], ["Maturation feed", /squid|krill|polychaete|worm|scallop|mussel|redimate|cod liver|cholest|astaxanthine|paprika|pepper|lecithin|lechithin|taurine|choline|yeast|protein gel|vitamin|mineral|spermax|hydromac|dailymin|origin|et 600|vt 600|vitamax|am garcin|enrichment/], ["Larval Feeds", /artemia|flake|larva|zoea|mysis|pl 150|pl 300|lansy|skeletonema|nannochloropsis|spirulina|lorica|elevia|wean|mrm|royal cavier|pro tab|pro w|pro 2|z pro|sano|\bcid\b|\bfit\b|\bmic\b|rw 400|\d car\b|\d cd\b|\bez |\bmp\d|summit/], ["Water conditioners", /edta|bicarbonate|calcium oxide|permanganate|sea ?fresh|uniclear|alum|chloride|silicate|hydrochloric|nitrate|sulphate|thiosulphate|hydroxide|calcium|magnesium|acid/]];
+        const guessCat = n => { const t = n.toLowerCase(); for (const [c, r] of CATRULES) if (r.test(t)) return c; return "Others" };
+        const catOf = n => S.cat[n] || guessCat(n);
+        const stockSite = p => SITEN.includes(p.ship) ? p.ship : p.site;
+        const mkey = (site, item, unit) => siteKey(site) + "|" + item + "|" + unit;
+        const enc = s => encodeURIComponent(s).replace(/'/g, "%27"), dec = decodeURIComponent;
+        const r2 = n => Math.round((n + Number.EPSILON) * 100) / 100, r3 = n => Math.round((n + Number.EPSILON) * 1000) / 1000;
+        const num = (n, d = 2) => Number(n || 0).toLocaleString("en-IN", { maximumFractionDigits: d });
+        const lkey = (ym, site) => ym + "|" + siteKey(site), isLocked = (site, ym) => !!S.lock[lkey(ym, site)], locked = (d, site) => isLocked(site, d.slice(0, 7));
+        const ymName = ym => MN[+ym.slice(5, 7) - 1] + " " + ym.slice(0, 4);
+        const lastDay = ym => new Date(+ym.slice(0, 4), +ym.slice(5, 7), 0).getDate();
+        let SS = SITEN[0], RS = "*", SM = today().slice(0, 7), PA = false, SE = null, SF = today().slice(0, 8) + "01", ST = today(), SC = "", IOT = "";
+
+        /* every stock movement: accepted GRN qty comes in automatically; direct IN, OUT, opening and count entries are in Stock Entry */
+        function allMoves() {
+            const a = [];
+            S.grns.forEach(g => {
+                const p = po(g.po); if (!p) return; const st = stockSite(p);
+                g.items.forEach((i, k) => { const pi = p.items[k] || {}; if (+i.acc > 0) a.push({ d: g.date, site: st, item: i.item, unit: pi.unit || "", t: "IN", q: +i.acc, r: +pi.rate || 0, ref: g.id, dept: "", by: g.by || "", note: "" }) })
+            });
+            (S.mv || []).forEach(m => a.push({ d: m.date, site: m.site, item: m.item, unit: m.unit, t: m.type, q: +m.qty, r: +m.rate || 0, ref: m.inv || m.id, dept: m.dept || "", by: m.by || "", note: m.note || "" }));
+            return a.sort((x, y) => x.d < y.d ? -1 : x.d > y.d ? 1 : ORD[x.t] - ORD[y.t])
+        }
+
+        /* opening / received / issued / adjustments / closing for one site; a month ("YYYY-MM") or an explicit {s,e} date range; weighted average cost */
+        function stockCalc(site, ym, rng) {
+            const s = rng ? rng.s : ym + "-01", e = rng ? rng.e : ym + "-31", R = {};
+            allMoves().forEach(m => {
+                if (m.site !== site || m.d > e) return;
+                const k = m.item + "|" + m.unit, x = R[k] || (R[k] = { item: m.item, unit: m.unit, q: 0, v: 0, oq: 0, ov: 0, inq: 0, inv: 0, outq: 0, outv: 0, adq: 0, adv: 0, last: "", snap: 0 });
+                if (m.d >= s && !x.snap) { x.oq = x.q; x.ov = x.v; x.snap = 1 }
+                const nq = x.q + m.q, avg = x.q > 0 ? x.v / x.q : m.r;
+                let val = (m.t === "IN" || m.t === "OPEN") ? m.q * m.r : m.q * avg;
+                if (m.q < 0 && Math.abs(nq) < 1e-9) val = -x.v;
+                x.q = Math.abs(nq) < 1e-9 ? 0 : nq; x.v += val; if (x.q === 0) x.v = 0;
+                if (m.d >= s) { if (m.t === "IN") { x.inq += m.q; x.inv += val } else if (m.t === "ISSUE") { x.outq -= m.q; x.outv -= val } else { x.adq += m.q; x.adv += val } }
+                x.last = m.d
+            });
+            const endD = rng ? new Date(rng.e) : new Date(+ym.slice(0, 4), +ym.slice(5, 7), 0);
+            const rows = Object.values(R).map(x => {
+                if (!x.snap) { x.oq = x.q; x.ov = x.v }
+                const o = { item: x.item, unit: x.unit, cat: catOf(x.item), oq: r3(x.oq), inq: r3(x.inq), outq: r3(x.outq), adq: r3(x.adq), cq: r3(x.q), last: x.last, ov: r2(x.ov), inv: r2(x.inv), outv: r2(x.outv), adv: r2(x.adv) };
+                o.cv = r2(o.ov + o.inv + o.adv - o.outv); o.avg = o.cq > 0 ? r2(o.cv / o.cq) : 0;
+                o.min = +(S.min[mkey(site, x.item, x.unit)] || 0);
+                const dead = o.cq > 0 && (endD - new Date(o.last)) / 864e5 > 90;
+                o.st = o.cq < 0 ? "Negative" : o.cq === 0 ? "Out" : o.min > 0 && o.cq < o.min ? "Low" : dead ? "No movement 90d" : "OK";
+                return o
+            }).filter(o => o.oq || o.inq || o.outq || o.adq || o.cq).sort((a, b) => a.item.localeCompare(b.item));
+            const T = { ov: 0, inv: 0, outv: 0, adv: 0, cv: 0, n: rows.length, low: 0, neg: 0, dead: 0 };
+            rows.forEach(o => { T.ov += o.ov; T.inv += o.inv; T.outv += o.outv; T.adv += o.adv; T.cv += o.cv; if (o.st === "Low" || o.st === "Out") T.low++; if (o.st === "Negative") T.neg++; if (o.st === "No movement 90d") T.dead++ });
+            ["ov", "inv", "outv", "adv", "cv"].forEach(k => T[k] = r2(T[k]));
+            return { rows, T, site, ym }
+        }
+        function catSum(rows) { const m = {}; rows.forEach(x => { const c = m[x.cat] || (m[x.cat] = { cat: x.cat, n: 0, ov: 0, inv: 0, adv: 0, outv: 0, cv: 0 }); c.n++;["ov", "inv", "adv", "outv", "cv"].forEach(k => c[k] = r2(c[k] + x[k])) }); return CATS.filter(c => m[c]).map(c => m[c]) }
+        const catTable = rows => {
+            const cs = catSum(rows), t = { n: 0, ov: 0, inv: 0, adv: 0, outv: 0, cv: 0 }; cs.forEach(c => Object.keys(t).forEach(k => t[k] = r2(t[k] + c[k])));
+            return `<div class="tw"><table><tr><th>Category</th><th>Items</th><th>Opening</th><th>Received</th><th>Adj</th><th>Issued</th><th>Closing</th></tr>${cs.map(c => `<tr><td>${c.cat}</td><td>${c.n}</td><td>${inr(c.ov)}</td><td>${inr(c.inv)}</td><td>${inr(c.adv)}</td><td>${inr(c.outv)}</td><td><b>${inr(c.cv)}</b></td></tr>`).join("") || `<tr><td colspan="7" class="note">No stock.</td></tr>`}<tr class="tot"><td>Total</td><td>${t.n}</td><td>${inr(t.ov)}</td><td>${inr(t.inv)}</td><td>${inr(t.adv)}</td><td>${inr(t.outv)}</td><td>${inr(t.cv)}</td></tr></table></div>`
+        };
+
+        const stPill = s => `<span class="pill ${s === "OK" ? "ok" : s === "Negative" || s === "Out" ? "bad" : "warn"}">${s}</span>`;
+        const siteSel = (k, all) => { const v = k === "SS" ? SS : RS; return `<select style="width:auto" onchange="setV('${k}',this.value)">${all ? `<option value="*" ${v === "*" ? "selected" : ""}>All sites</option>` : ""}${SITEN.map(s => `<option ${s === v ? "selected" : ""}>${esc(s)}</option>`).join("")}</select>` };
+        function setV(k, v) { if (k === "SS") SS = v; else RS = v; render() }
+        const monIn = () => `<input type="month" style="width:auto" value="${SM}" onchange="if(this.value){SM=this.value;render()}">`;
+        const catSel = () => `<select style="width:auto" onchange="SC=this.value;render()"><option value="">All categories</option>${CATS.map(c => `<option ${c === SC ? "selected" : ""}>${c}</option>`).join("")}</select>`;
+        const dRange = () => `<span class="sub">From</span><input type="date" style="width:auto" value="${SF}" onchange="SF=this.value||SF;render()"><span class="sub">To</span><input type="date" style="width:auto" value="${ST}" onchange="ST=this.value||ST;render()">`;
+
+        /* ---- Stock register: closing stock by site, category and date range ---- */
+        function stockView() {
+            const c = stockCalc(SS, "", { s: SF, e: ST }), rows = c.rows.filter(x => (!SC || x.cat === SC) && hit([x.item, x.unit, x.cat]));
+            return `<div class="top"><div><h1>Stock Register</h1><div class="sub">Opening as on the From date, closing as on the To date · received = accepted GRN or direct IN entry · weighted average cost</div></div><div class="row"><button class="btn g" onclick="SE=null;go('sentry')">+ IN / OUT Entry</button><button class="btn" onclick="RS=SS;go('mend')">Month-End Report</button></div></div>
+${srch(siteSel("SS") + dRange() + catSel())}
+<div class="stat"><div>Items<b>${c.T.n}</b></div><div>Closing value<b>${inr(c.T.cv)}</b></div><div>Low / out of stock<b>${c.T.low}</b></div><div>Negative balances<b>${c.T.neg}</b></div></div>
+<div class="card"><h3>Closing stock by category · ${esc(SS)} · as on ${dmy(ST, "-")}</h3>${catTable(c.rows)}</div>
+<div class="card"><div class="tw"><table><tr><th>#</th><th>Item</th><th>Category</th><th>Unit</th><th>Opening</th><th>Received</th><th>Issued</th><th>Adj</th><th>Closing</th><th>Avg rate</th><th>Value</th><th>Min level</th><th>Status</th><th></th></tr>
+${rows.map((x, i) => `<tr><td>${i + 1}</td><td>${esc(x.item)}</td><td><select style="min-width:120px" onchange="setCat('${enc(x.item)}',this.value)">${CATS.map(k => `<option ${k === x.cat ? "selected" : ""}>${k}</option>`).join("")}</select></td><td>${esc(x.unit)}</td><td>${num(x.oq, 3)}</td><td>${num(x.inq, 3)}</td><td>${num(x.outq, 3)}</td><td>${x.adq ? num(x.adq, 3) : ""}</td><td><b>${num(x.cq, 3)}</b></td><td>${num(x.avg)}</td><td>${inr(x.cv)}</td><td><input type="number" min="0" step="any" style="min-width:60px" value="${x.min || ""}" placeholder="—" onchange="setMin('${enc(x.item)}','${enc(x.unit)}',this.value)"></td><td>${stPill(x.st)}</td><td><button class="btn g s" onclick="go('sled','${enc(x.item + "|" + x.unit)}')">Ledger</button></td></tr>`).join("") || `<tr><td colspan="14" class="note">No stock at ${esc(SS)} for this selection. Stock appears once a GRN is submitted or an IN / opening entry is made.</td></tr>`}
+<tr class="tot"><td></td><td>Total</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>${inr(rows.reduce((a, x) => a + x.cv, 0))}</td><td></td><td></td><td></td></tr></table></div>
+<div class="note">Categories are auto-assigned from the product name; change any item's category in the table and it is remembered. Set a minimum level to get Low-stock flags.</div></div>`}
+        function setMin(i, u, v) { S.min[mkey(SS, dec(i), dec(u))] = +v || 0; save(); toast("Minimum level saved"); render() }
+        function setCat(i, v) { S.cat[dec(i)] = v; save(); toast("Category saved"); render() }
+
+        /* ---- IN / OUT view: every entry in a date range ---- */
+        function inoutView() {
+            const ms = allMoves().filter(m => m.site === SS && m.d >= SF && m.d <= ST && (!SC || catOf(m.item) === SC) && (!IOT || (IOT === "IN" ? m.q > 0 : m.q < 0)) && hit([m.item, m.ref, m.by, m.note, m.dept])).reverse();
+            const inV = r2(ms.reduce((a, m) => a + (m.t === "IN" ? m.q * m.r : 0), 0)), nIn = ms.filter(m => m.q > 0).length, nOut = ms.filter(m => m.q < 0).length;
+            return `<div class="top"><div><h1>IN / OUT View</h1><div class="sub">Every purchase receipt, issue, opening and count entry · ${esc(SS)}</div></div><div class="row"><button class="btn g" onclick="SE=null;go('sentry')">+ IN / OUT Entry</button></div></div>
+${srch(siteSel("SS") + dRange() + catSel() + `<select style="width:auto" onchange="IOT=this.value;render()"><option value="">IN and OUT</option><option value="IN" ${IOT === "IN" ? "selected" : ""}>IN only</option><option value="OUT" ${IOT === "OUT" ? "selected" : ""}>OUT only</option></select>`)}
+<div class="stat"><div>Entries<b>${ms.length}</b></div><div>IN entries<b>${nIn}</b></div><div>OUT entries<b>${nOut}</b></div><div>Purchase value (IN)<b>${inr(inV)}</b></div></div>
+<div class="card"><div class="tw"><table><tr><th>Date</th><th>Type</th><th>Ref / Invoice</th><th>Item</th><th>Category</th><th>Unit</th><th>IN</th><th>OUT</th><th>Rate</th><th>Dept / By</th><th>Note</th></tr>
+${ms.map(m => `<tr><td>${dmy(m.d)}</td><td>${TL[m.t]}</td><td>${esc(m.ref)}</td><td>${esc(m.item)}</td><td>${esc(catOf(m.item))}</td><td>${esc(m.unit)}</td><td>${m.q > 0 ? num(m.q, 3) : ""}</td><td>${m.q < 0 ? num(-m.q, 3) : ""}</td><td>${m.q > 0 && m.r ? num(m.r) : ""}</td><td>${esc([m.dept, m.by].filter(Boolean).join(" / "))}</td><td>${esc(m.note)}</td></tr>`).join("") || `<tr><td colspan="11" class="note">No entries for this selection.</td></tr>`}</table></div></div>`
+        }
+
+        function ledgerView() {
+            const [item, unit] = dec(sel).split("|"); let b = 0;
+            const ms = allMoves().filter(m => m.site === SS && m.item === item && m.unit === unit);
+            return `<div class="top"><div><h1>${esc(item)}</h1><div class="sub">Stock ledger · ${esc(SS)} · ${esc(unit)} · ${esc(catOf(item))}</div></div><button class="btn g" onclick="go('stock')">← Back to register</button></div>
+<div class="card"><div class="tw"><table><tr><th>Date</th><th>Type</th><th>Ref</th><th>Dept / By</th><th>Note</th><th>In</th><th>Out</th><th>Balance</th></tr>
+${ms.map(m => { b = r3(b + m.q); return `<tr><td>${dmy(m.d)}</td><td>${TL[m.t]}</td><td>${esc(m.ref)}</td><td>${esc([m.dept, m.by].filter(Boolean).join(" / "))}</td><td>${esc(m.note)}</td><td>${m.q > 0 ? num(m.q, 3) : ""}</td><td>${m.q < 0 ? num(-m.q, 3) : ""}</td><td><b>${num(b, 3)}</b></td></tr>` }).join("") || `<tr><td colspan="8" class="note">No movements.</td></tr>`}</table></div></div>`
+        }
+
+        /* ---- IN / OUT / opening / count entry ---- */
+        const blankSE = () => ({ type: "ISSUE", date: today(), site: (currentUser && currentUser.site && SITEN.includes(currentUser.site) ? currentUser.site : SS), item: "", unit: "Kg", qty: "", rate: "", total: "", inv: "", exp: "", cat: "", dept: "WATER SECTION", by: (currentUser ? currentUser.name : ""), note: "" });
+        function seItems(site) { const m = new Map(); stockCalc(site, "9999-12").rows.forEach(x => m.set(x.item, x.unit)); Object.values(S.pr[siteKey(site)] || {}).forEach(a => a.forEach(p => { if (!m.has(p[0])) m.set(p[0], unitOf(p[1])) })); return m }
+        const seAvail = () => { const r = stockCalc(SE.site, "9999-12").rows.find(x => x.item === SE.item.trim() && x.unit === SE.unit); return r ? r.cq : 0 };
+        const seCat = () => SE.cat || (SE.item.trim() ? catOf(SE.item.trim()) : "Others");
+        function seUnit() { const u = seItems(SE.site).get(SE.item.trim()); if (u) SE.unit = u }
+        function seHint() {
+            const e = SE, av = seAvail(), q = +e.qty;
+            if (e.type === "ISSUE") return e.item ? `Available: ${num(av, 3)} ${e.unit}` + (e.qty !== "" && q > av ? " — not enough stock" : "") : "";
+            if (e.type === "ADJ") return e.item ? `System stock: ${num(av, 3)} ${e.unit}` + (e.qty !== "" && q >= 0 ? ` · Difference: ${num(r3(q - av), 3)}` : "") : "";
+            if (e.type === "IN") return e.qty !== "" && e.total !== "" && q > 0 ? `Unit cost: ${inr(r2(+e.total / q))} per ${e.unit}` : "";
+            return e.qty !== "" && e.rate !== "" ? `Value: ${inr(r2(q * e.rate))}` : ""
+        }
+        function refreshSE() { const u = document.getElementById("seunit"), h = document.getElementById("sehint"), c = document.getElementById("secat"); if (u) u.value = SE.unit; if (c) c.value = seCat(); if (h) h.textContent = seHint() }
+        function entryView() {
+            if (!SE) SE = blankSE(); const e = SE, items = [...seItems(e.site).keys()];
+            const o = (a, v) => a.map(x => `<option ${x === v ? "selected" : ""}>${esc(x)}</option>`).join("");
+            const TY = [["IN", "IN Entry (purchase received)"], ["ISSUE", "OUT Entry (issue / usage)"], ["OPEN", "Opening stock"], ["ADJ", "Physical count"]];
+            const hs = `oninput="refreshSE()"`;
+            const list = S.mv.filter(m => m.site === e.site).slice().reverse().slice(0, 25);
+            return `<div class="top"><div><h1>IN / OUT Entry</h1><div class="sub">Record stock received (without a PO), usage, opening balances and physical-count corrections. PO purchases also come in automatically when a GRN is submitted.</div></div><button class="btn ok" onclick="saveSE()">SAVE</button></div>
+<div class="months">${TY.map(t => `<button class="${e.type === t[0] ? "on" : ""}" onclick="SE.type='${t[0]}';render()">${t[1]}</button>`).join("")}</div>
+<div class="card"><div class="grid">
+${f("Date", `<input type="date" value="${e.date}" max="${today()}" oninput="SE.date=this.value">`)}
+${f("Site", `<select onchange="SE.site=this.value;SS=this.value;SE.item='';render()">${o(SITEN, e.site)}</select>`)}
+${f("Product", `<input list="seitems" value="${esc(e.item)}" placeholder="Type or pick product" onchange="SE.item=this.value;SE.cat='';seUnit();refreshSE()"><datalist id="seitems">${items.map(i => `<option value="${esc(i)}">`).join("")}</datalist>`)}
+${e.type === "IN" || e.type === "OPEN" ? f("Category", `<select id="secat" onchange="SE.cat=this.value">${o(CATS, seCat())}</select>`) : ""}
+${f("Unit", `<select id="seunit" onchange="SE.unit=this.value;refreshSE()">${o(["Kg", "g", "Litre", "ml", "Nos"], e.unit)}</select>`)}
+${e.type === "ISSUE" ? f("Department / section", inp(e.dept, `oninput="SE.dept=this.value"`)) : ""}
+${f(e.type === "ADJ" ? "Counted quantity" : e.type === "OPEN" ? "Opening quantity" : e.type === "IN" ? "Quantity received" : "Quantity issued", `<input type="number" min="0" step="any" value="${e.qty}" oninput="SE.qty=this.value;refreshSE()">`)}
+${e.type === "OPEN" ? f("Cost per unit (₹)", `<input type="number" min="0" step="any" value="${e.rate}" oninput="SE.rate=this.value;refreshSE()">`) : ""}
+${e.type === "IN" ? f("Total cost (₹)", `<input type="number" min="0" step="any" value="${e.total}" oninput="SE.total=this.value;refreshSE()">`) + f("Invoice No", inp(e.inv, `oninput="SE.inv=this.value"`)) + f("Expiry date", `<input type="date" value="${e.exp}" oninput="SE.exp=this.value">`) : ""}
+${f(e.type === "ADJ" ? "Counted by" : e.type === "ISSUE" ? "Issued by" : e.type === "IN" ? "Received by" : "Entered by", inp(e.by, `placeholder="Enter name" oninput="SE.by=this.value"`))}
+${f(e.type === "ADJ" ? "Reason (required)" : "Note", inp(e.note, `oninput="SE.note=this.value"`))}
+</div><div class="note" id="sehint">${esc(seHint())}</div></div>
+<div class="card"><h3>Recent entries · ${esc(e.site)}</h3><div class="tw"><table><tr><th>Date</th><th>Type</th><th>Product</th><th>Qty</th><th>Unit</th><th>Invoice / Dept</th><th>By</th><th>Note</th><th></th></tr>
+${list.map(m => `<tr><td>${dmy(m.date)}</td><td>${TL[m.type]}</td><td>${esc(m.item)}</td><td>${m.qty > 0 ? "+" : ""}${num(m.qty, 3)}</td><td>${esc(m.unit)}</td><td>${esc(m.inv || m.dept || "")}</td><td>${esc(m.by)}</td><td>${esc(m.note)}</td><td><button class="btn g s" onclick="delMv('${m.id}')">Del</button></td></tr>`).join("") || `<tr><td colspan="9" class="note">No manual entries yet.</td></tr>`}</table></div></div>`
+        }
+        function saveSE() {
+            const e = SE, q = +e.qty;
+            if (!e.item.trim()) return toast("Choose a product");
+            if (e.qty === "" || !(q >= 0)) return toast("Enter quantity");
+            if (!e.by.trim()) return toast("Enter your name");
+            if (e.date > today()) return toast("Date cannot be in the future");
+            if (locked(e.date, e.site)) return toast("That month is approved and locked for this site");
+            const av = seAvail(); let qty, rate = 0, note = e.note.trim();
+            if (e.type === "ISSUE") { if (!(q > 0)) return toast("Quantity must be above 0"); if (q > av + 1e-9) return toast("Only " + num(av, 3) + " " + e.unit + " available"); qty = -q }
+            else if (e.type === "IN") { if (!(q > 0)) return toast("Quantity must be above 0"); if (e.total === "" || !(+e.total >= 0)) return toast("Enter total cost"); if (e.exp && e.exp <= e.date) return toast("Expiry date must be after the entry date"); qty = q; rate = Math.round(+e.total / q * 10000) / 10000; note = [e.exp ? "Exp " + dmy(e.exp, "-") : "", note].filter(Boolean).join(" · ") }
+            else if (e.type === "OPEN") { if (!(q > 0)) return toast("Quantity must be above 0"); if (e.rate === "" || !(+e.rate >= 0)) return toast("Enter cost per unit"); qty = q; rate = +e.rate }
+            else { if (!note) return toast("Give a reason for the adjustment"); qty = r3(q - av); if (!qty) return toast("Count matches system stock - nothing to adjust") }
+            if (e.type === "IN" || e.type === "OPEN") S.cat[e.item.trim()] = seCat();
+            S.mv.push({ id: "MV" + Date.now(), type: e.type, date: e.date, site: e.site, item: e.item.trim(), unit: e.unit, qty, rate, inv: e.type === "IN" ? e.inv.trim() : "", exp: e.type === "IN" ? e.exp : "", dept: e.type === "ISSUE" ? e.dept : "", by: e.by.trim(), note });
+            save(); toast(e.type === "ISSUE" ? "OUT entry saved" : e.type === "IN" ? "IN entry saved" : e.type === "OPEN" ? "Opening stock saved" : "Adjustment saved");
+            SS = e.site; SE = { ...blankSE(), type: e.type, site: e.site, date: e.date, by: e.by, dept: e.dept }; render()
+        }
+        function delMv(id) { const m = S.mv.find(x => x.id === id); if (!m) return; if (locked(m.date, m.site)) return toast("Month is approved and locked"); S.mv = S.mv.filter(x => x !== m); save(); toast("Entry deleted"); render() }
+
+        /* ---- Month-end report ---- */
+        function lockCard(site) {
+            const L = S.lock[lkey(SM, site)];
+            return `<div class="card noprint"><h3>Month sign-off · ${esc(site)} · ${ymName(SM)}</h3>${L ? `<div class="row" style="align-items:center"><span class="pill ok">Approved &amp; locked by ${esc(L.by)} on ${dmy(L.on)}</span><button class="btn g s" onclick="unlockM()">Unlock</button></div><div class="note">Stock entries and GRNs dated in this month are blocked for this site.</div>` : `<div class="row"><input id="lkby" style="max-width:260px" placeholder="Approved by (name)" value="${esc(currentUser ? currentUser.name : "")}"><button class="btn ok" onclick="lockM()">Approve &amp; lock month</button></div><div class="note">After approval nobody can add, change or delete stock entries or GRNs dated in this month for this site.</div>`}</div>`
+        }
+        function lockM() { const n = document.getElementById("lkby").value.trim(); if (!n) return toast("Enter approver name"); S.lock[lkey(SM, RS)] = { by: n, on: today() }; save(); toast("Month locked"); render() }
+        function unlockM() { delete S.lock[lkey(SM, RS)]; save(); toast("Month unlocked"); render() }
+        function siteDoc(c, brk) {
+            const site = c.site, T = c.T, L = S.lock[lkey(SM, site)], rows = c.rows, ld = lastDay(SM), mm = SM.slice(5), yy = SM.slice(0, 4);
+            const NT = { Low: x => "Minimum level " + num(x.min, 3), Out: () => "Nil stock", Negative: () => "Issued more than recorded - check GRN / opening entry", "No movement 90d": x => "Value " + inr(x.cv) + " · last movement " + dmy(x.last) };
+            const ex = rows.filter(x => x.st !== "OK").map(x => [x.st, x.item, num(x.cq, 3) + " " + x.unit, NT[x.st](x)]).concat(allMoves().filter(m => m.site === site && m.t === "ADJ" && m.d.slice(0, 7) === SM).map(m => ["Count adjustment", m.item, (m.q > 0 ? "+" : "") + num(m.q, 3) + " " + m.unit, (m.note || "") + (m.by ? " (" + m.by + ")" : "")]));
+            const sum = [["Opening stock value", T.ov], ["+ Received (GRN / IN entries)", T.inv], ["+ Adjustments / opening entries", T.adv], ["− Issued / used (OUT)", T.outv]];
+            return `<div class="card doc ${brk ? "pg" : ""}">
+<div style="text-align:center"><b>Unibio India Hatcheries Pvt Ltd</b><br>Month-End Stock Statement<br><b>${esc(site)}</b></div>
+<div class="grid" style="margin:14px 0"><div>Period<br><b>01-${mm}-${yy} to ${ld}-${mm}-${yy}</b></div><div>Generated on<br><b>${dmy(today(), "-")}</b></div><div>Status<br><b>${L ? "Approved by " + esc(L.by) + " on " + dmy(L.on, "-") : "Draft - not yet approved"}</b></div></div>
+<div class="tw"><table style="min-width:0;max-width:420px">${sum.map(r => `<tr><td>${r[0]}</td><td style="text-align:right">${inr(r[1])}</td></tr>`).join("")}<tr class="tot"><td>Closing stock value</td><td style="text-align:right">${inr(T.cv)}</td></tr></table></div>
+<div class="fn">Items held: ${T.n} · Low / out of stock: ${T.low} · Negative balances: ${T.neg} · No movement 90 days: ${T.dead}</div>
+<h3 style="margin:18px 0 8px">Closing stock by category</h3>${catTable(rows)}
+<h3 style="margin:18px 0 8px">Stock statement</h3>
+<div class="tw"><table><tr><th>#</th><th>Item</th><th>Category</th><th>Unit</th><th>Opening</th><th>Received</th><th>Issued</th><th>Adj</th><th>Closing</th><th>Avg rate</th><th>Value</th><th>Status</th></tr>
+${rows.map((x, i) => `<tr><td>${i + 1}</td><td>${esc(x.item)}</td><td>${esc(x.cat)}</td><td>${esc(x.unit)}</td><td>${num(x.oq, 3)}</td><td>${num(x.inq, 3)}</td><td>${num(x.outq, 3)}</td><td>${x.adq ? num(x.adq, 3) : ""}</td><td><b>${num(x.cq, 3)}</b></td><td>${num(x.avg)}</td><td>${inr(x.cv)}</td><td>${x.st}</td></tr>`).join("") || `<tr><td colspan="12">No stock.</td></tr>`}
+<tr class="tot"><td></td><td>Total value</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>${inr(T.cv)}</td><td></td></tr></table></div>
+<h3 style="margin:18px 0 8px">Exceptions</h3>
+${ex.length ? `<div class="tw"><table><tr><th>Type</th><th>Item</th><th>Quantity</th><th>Note</th></tr>${ex.map(r => `<tr><td>${r[0]}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td><td>${esc(r[3])}</td></tr>`).join("")}</table></div>` : `<div class="fn">No exceptions this month.</div>`}
+<div class="grid" style="margin-top:40px"><div>Prepared by<br><br><br>Site In-charge</div><div>Verified by<br><br><br>Accounts</div><div>Approved by<br><br><br>Management</div></div>
+<div class="fn">Received = accepted GRN quantity plus direct IN entries. Issued and closing stock are valued at weighted average cost as on the last day of the month.</div></div>`}
+        function mendView() {
+            const C = SITEN.map(s => stockCalc(s, SM)), one = !PA && RS !== "*", showCons = !one;
+            const G2 = { ov: 0, inv: 0, adv: 0, outv: 0, cv: 0, n: 0, low: 0, neg: 0 }; C.forEach(c => Object.keys(G2).forEach(k => G2[k] += c.T[k])); Object.keys(G2).forEach(k => G2[k] = r2(G2[k]));
+            const docs = PA ? C : one ? C.filter(c => c.site === RS) : [];
+            return `<div class="top"><div><h1>Month-End Stock Report</h1><div class="sub">One statement per site for management · ${ymName(SM)}</div></div><div class="row"><button class="btn g" onclick="copySummary()">Copy summary</button><button class="btn g" onclick="stockCsv()">Download Excel (CSV)</button><button class="btn g" onclick="printAll()">Print all sites</button><button class="btn" onclick="window.print()">Print / PDF</button></div></div>
+<div class="row noprint" style="margin-bottom:14px">${monIn()}${siteSel("RS", true)}</div>
+${showCons ? `<div class="card doc ${PA ? "pg" : ""}"><div style="text-align:center"><b>Unibio India Hatcheries Pvt Ltd</b><br>Month-End Stock Summary - All Sites · ${ymName(SM)}</div>
+<div class="tw" style="margin-top:14px"><table><tr><th>Site</th><th>Opening</th><th>Received</th><th>Adj</th><th>Issued</th><th>Closing</th><th>Items</th><th>Low / out</th><th>Negative</th><th>Status</th><th class="noprint"></th></tr>
+${C.map((c, i) => `<tr><td>${esc(c.site)}</td><td>${inr(c.T.ov)}</td><td>${inr(c.T.inv)}</td><td>${inr(c.T.adv)}</td><td>${inr(c.T.outv)}</td><td><b>${inr(c.T.cv)}</b></td><td>${c.T.n}</td><td>${c.T.low}</td><td>${c.T.neg}</td><td>${isLocked(c.site, SM) ? '<span class="pill ok">Approved</span>' : '<span class="pill warn">Open</span>'}</td><td class="noprint"><button class="btn g s" onclick="RS=SITEN[${i}];render()">View</button></td></tr>`).join("")}
+<tr class="tot"><td>Total</td><td>${inr(G2.ov)}</td><td>${inr(G2.inv)}</td><td>${inr(G2.adv)}</td><td>${inr(G2.outv)}</td><td>${inr(G2.cv)}</td><td>${G2.n}</td><td>${G2.low}</td><td>${G2.neg}</td><td></td><td class="noprint"></td></tr></table></div>
+<h3 style="margin:18px 0 8px">Closing stock by category - all sites</h3>${catTable([].concat(...C.map(c => c.rows)))}
+<div class="fn">Closing = Opening + Received + Adjustments − Issued · values at weighted average cost. Amounts in ₹.</div></div>`: ""}
+${docs.map((c, i) => siteDoc(c, PA && i < docs.length - 1)).join("")}
+${one ? lockCard(RS) : ""}`
+        }
+        function printAll() { PA = true; render(); setTimeout(() => { window.print(); PA = false; render() }, 300) }
+        function dl(name, text) { try { const b = new Blob(["﻿" + text], { type: "text/csv" }), a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = name; document.body.appendChild(a); a.click(); a.remove(); toast("Downloaded " + name) } catch (e) { try { navigator.clipboard.writeText(text); toast("Copied - paste into Excel") } catch (_) { toast("Download blocked by browser") } } }
+        const csvc = v => typeof v === "number" ? v : '"' + String(v).replace(/"/g, '""') + '"';
+        function stockCsv() {
+            const h = ["Month", "Site", "Item", "Category", "Unit", "Opening Qty", "Received Qty", "Issued Qty", "Adjustment Qty", "Closing Qty", "Avg Rate", "Opening Value", "Received Value", "Issued Value", "Adjustment Value", "Closing Value", "Min Level", "Status"], out = [h.join(",")];
+            (RS === "*" ? SITEN : [RS]).forEach(s => stockCalc(s, SM).rows.forEach(x => out.push([ymName(SM), s, x.item, x.cat, x.unit, x.oq, x.inq, x.outq, x.adq, x.cq, x.avg, x.ov, x.inv, x.outv, x.adv, x.cv, x.min, x.st].map(csvc).join(","))));
+            dl("UniBio_stock_" + (RS === "*" ? "all_sites" : siteKey(RS).replace(/\W+/g, "_")) + "_" + SM + ".csv", out.join("\r\n"))
+        }
+        function copySummary() {
+            const C = SITEN.map(s => stockCalc(s, SM)); let t = "Month-end stock - " + ymName(SM) + "\n";
+            C.forEach(c => t += c.site + ": Opening " + inr(c.T.ov) + " | Received " + inr(c.T.inv) + " | Issued " + inr(c.T.outv) + " | Closing " + inr(c.T.cv) + (c.T.low ? " | Low/out items: " + c.T.low : "") + "\n");
+            t += "Total closing: " + inr(r2(C.reduce((a, c) => a + c.T.cv, 0)));
+            try { navigator.clipboard.writeText(t).then(() => toast("Summary copied - paste in WhatsApp or email"), () => toast("Copy blocked by browser")) } catch (e) { toast("Copy not available") }
+        }
+
+        /* ---------- shell ---------- */
+        function render() {
+            renderWho();
+            const n = pending(); document.getElementById("nav").innerHTML = NAV.map(([k, l]) => `<button class="${k === cur || (k === "status" && (cur === "pod" || cur === "grnd") && 0) || (k === "po" && (cur === "pod" || cur === "poe")) || (k === "grnl" && cur === "grnd") || (k === "stock" && cur === "sled") ? "on" : ""}" onclick="go('${k}')">${l}${k === "appr" && n ? `<span class="badge">${n}</span>` : ""}</button>`).join("");
+            const m = { stock: stockView, inout: inoutView, sled: ledgerView, sentry: entryView, mend: mendView, grnl: grnListView, po: poList, poe: poForm, pod: podView, pm: pmView, grn: grnView, grnd: grnDetail, bill: billView, status: statusView, tally: tallyView, recon: reconView, vendors: vendView, appr: apprView };
+            document.getElementById("main").innerHTML = m[cur](); window.scrollTo(0, 0)
+        }
+        checkAuthAndDisplay();
+    </script>
+</body>
+
+</html>

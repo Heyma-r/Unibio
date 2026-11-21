@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Sign In · UniBio Purchase System</title>
+    <style>
+        :root {
+            --bg: #1a1f1e;
+            --card: #212827;
+            --card-sub: #171c1b;
+            --line: #2e3837;
+            --line-focus: #c47a38;
+            --tx: #e9ece9;
+            --mut: #9aa6a3;
+            --side: #1e3a5f;
+            --acc: #c47a38;
+            --acc-hover: #dc8c46;
+            --ok: #3f9d68;
+            --bad: #d4623e;
+            --warn: #d9a441;
+            --inp: #171c1b;
+            color-scheme: dark;
+            box-sizing: border-box;
+        }
+
+        @media (prefers-color-scheme: light) {
+            :root:not([data-theme="dark"]) {
+                --bg: #f4f5f3;
+                --card: #ffffff;
+                --card-sub: #f8faf9;
+                --line: #d9dedc;
+                --line-focus: #c47a38;
+                --tx: #1c2321;
+                --mut: #5d6a67;
+                --inp: #f7f8f7;
+                --ok: #2e7d4f;
+                --bad: #b8472a;
+                --warn: #9a6f10;
+                color-scheme: light;
+            }
+        }
+
+        :root[data-theme="light"] {
+            --bg: #f4f5f3;
+            --card: #ffffff;
+            --card-sub: #f8faf9;
+            --line: #d9dedc;
+            --line-focus: #c47a38;
+            --tx: #1c2321;
+            --mut: #5d6a67;
+            --inp: #f7f8f7;
+            --ok: #2e7d4f;
+            --bad: #b8472a;
+            --warn: #9a6f10;
+            color-scheme: light;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--tx);
+            font: 14px/1.5 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 16px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Subtle background decoration */
+        body::before {
+            content: "";
+            position: fixed;
+            top: -20%;
+            left: -15%;
+            width: 50vw;
+            height: 50vw;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(30, 58, 95, 0.4) 0%, rgba(30, 58, 95, 0) 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            bottom: -20%;
+            right: -15%;
+            width: 50vw;
+            height: 50vw;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(196, 122, 56, 0.18) 0%, rgba(196, 122, 56, 0) 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 480px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .logo {
+            font: 700 32px Georgia, "Times New Roman", serif;
+            color: var(--tx);
+            letter-spacing: -0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .logo i {
+            color: var(--acc);
+            font-style: normal;
+        }
+
+        .company-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--mut);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-top: 6px;
+        }
+
+        .badge-portal {
+            display: inline-block;
+            background: rgba(30, 58, 95, 0.5);
+            border: 1px solid rgba(138, 160, 187, 0.3);
+            color: #c9d6e6;
+            font-size: 11px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        .auth-card {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 32px 28px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        .auth-card h2 {
+            font: 700 20px Georgia, serif;
+            margin-bottom: 6px;
+            color: var(--tx);
+        }
+
+        .auth-card p.desc {
+            font-size: 13px;
+            color: var(--mut);
+            margin-bottom: 22px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--mut);
+            margin-bottom: 6px;
+        }
+
+        .input-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrap input,
+        .input-wrap select {
+            width: 100%;
+            background: var(--inp);
+            color: var(--tx);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .input-wrap input:focus,
+        .input-wrap select:focus {
+            border-color: var(--acc);
+            box-shadow: 0 0 0 3px rgba(196, 122, 56, 0.2);
+        }
+
+        .pw-toggle {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            color: var(--mut);
+            cursor: pointer;
+            font-size: 12px;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pw-toggle:hover {
+            color: var(--tx);
+        }
+
+        .row-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            margin-top: 10px;
+            margin-bottom: 22px;
+            color: var(--mut);
+        }
+
+        .remember-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .remember-wrap input[type="checkbox"] {
+            accent-color: var(--acc);
+            width: 15px;
+            height: 15px;
+            cursor: pointer;
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: var(--acc);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font: 600 15px inherit;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.18s ease, transform 0.1s ease;
+        }
+
+        .btn-submit:hover {
+            background: var(--acc-hover);
+        }
+
+        .btn-submit:active {
+            transform: scale(0.99);
+        }
+
+        /* Demo credentials box */
+        .demo-section {
+            margin-top: 26px;
+            padding-top: 20px;
+            border-top: 1px dashed var(--line);
+        }
+
+        .demo-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--mut);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 8px;
+        }
+
+        .demo-btn {
+            background: var(--card-sub);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 8px 10px;
+            color: var(--tx);
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.15s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .demo-btn:hover {
+            border-color: var(--acc);
+            background: rgba(196, 122, 56, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .demo-role {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--acc);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .demo-name {
+            font-size: 11px;
+            color: var(--mut);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Notice / Error message */
+        .msg-banner {
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 18px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .msg-banner.error {
+            display: flex;
+            background: rgba(212, 98, 62, 0.15);
+            color: #f78d70;
+            border: 1px solid rgba(212, 98, 62, 0.3);
+        }
+
+        .msg-banner.success {
+            display: flex;
+            background: rgba(63, 157, 104, 0.15);
+            color: #6ed199;
+            border: 1px solid rgba(63, 157, 104, 0.3);
+        }
+
+        .msg-banner.info {
+            display: flex;
+            background: rgba(30, 58, 95, 0.35);
+            color: #9fb2c9;
+            border: 1px solid rgba(138, 160, 187, 0.3);
+        }
+
+        /* Active session info if already logged in */
+        .active-session-card {
+            display: none;
+            background: rgba(63, 157, 104, 0.12);
+            border: 1px solid rgba(63, 157, 104, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .active-session-card p {
+            font-size: 13px;
+            margin-bottom: 12px;
+            color: var(--tx);
+        }
+
+        .active-session-card b {
+            color: var(--ok);
+        }
+
+        .active-session-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .btn-direct {
+            background: var(--ok);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-switch {
+            background: var(--inp);
+            color: var(--mut);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 8px 14px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .btn-switch:hover {
+            color: var(--tx);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 22px;
+            font-size: 11px;
+            color: var(--mut);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-container">
+        <div class="brand-header">
+            <div class="logo">UniBio Purchase<i>.</i></div>
+            <div class="company-name">Unibio India Hatcheries Pvt Ltd</div>
+            <div class="badge-portal">Enterprise Material &amp; Purchase Portal</div>
+        </div>
+
+        <div class="auth-card">
+            <!-- Active session banner if user is already signed in -->
+            <div id="activeSessionBox" class="active-session-card">
+                <p>You are already signed in as <b id="activeUserName">User</b> (<span id="activeUserRole">Role</span>)</p>
+                <div class="active-session-actions">
+                    <a href="UniBio Purchase - with Stock.html" class="btn-direct">Continue to Purchase App &rarr;</a>
+                    <button type="button" class="btn-switch" onclick="logoutCurrent()">Sign Out</button>
+                </div>
+            </div>
+
+            <h2>Account Login</h2>
+            <p class="desc">Enter your credentials to access POs, stock register, and receipts</p>
+
+            <div id="loginMsg" class="msg-banner"></div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="username">Username or Email</label>
+                    <div class="input-wrap">
+                        <input type="text" id="username" placeholder="e.g. admin, manager, purchase" required autocomplete="username" autofocus>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrap">
+                        <input type="password" id="password" placeholder="Enter your password" required autocomplete="current-password">
+                        <button type="button" class="pw-toggle" onclick="togglePasswordVisibility()" aria-label="Toggle password visibility">
+                            <span id="pwToggleText">Show</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="site">Assigned Site / Facility</label>
+                    <div class="input-wrap">
+                        <select id="site">
+                            <option value="Unibio (India) Hatcheries Pvt Ltd">Unibio (India) Hatcheries Pvt Ltd - Mugaiyur</option>
+                            <option value="Unit 2">Unit 2</option>
+                            <option value="MKM-OS">MKM-OS</option>
+                            <option value="NLR-OS">NLR-OS</option>
+                            <option value="KKD-OS">KKD-OS</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row-options">
+                    <label class="remember-wrap">
+                        <input type="checkbox" id="rememberMe" checked>
+                        <span>Keep me logged in</span>
+                    </label>
+                    <span style="color:var(--mut); font-size:11px;">Default pwd: <code style="color:var(--acc);">password123</code></span>
+                </div>
+
+                <button type="submit" id="submitBtn" class="btn-submit">
+                    <span>Sign In to System</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </button>
+            </form>
+
+            <!-- 1-Click Demo Logins -->
+            <div class="demo-section">
+                <div class="demo-title">
+                    <span>Quick Demo Sign-in</span>
+                    <span>1-Click Fill</span>
+                </div>
+                <div class="demo-grid">
+                    <button type="button" class="demo-btn" onclick="fillDemo('admin')">
+                        <span class="demo-role">&#128081; Management</span>
+                        <span class="demo-name">Director / Admin</span>
+                    </button>
+                    <button type="button" class="demo-btn" onclick="fillDemo('manager')">
+                        <span class="demo-role">&#128300; Manager</span>
+                        <span class="demo-name">Dr. K. Ramesh</span>
+                    </button>
+                    <button type="button" class="demo-btn" onclick="fillDemo('purchase')">
+                        <span class="demo-role">&#128722; Purchase</span>
+                        <span class="demo-name">S. Arun (Exec)</span>
+                    </button>
+                    <button type="button" class="demo-btn" onclick="fillDemo('store')">
+                        <span class="demo-role">&#128230; Stores</span>
+                        <span class="demo-name">M. Suresh (Store)</span>
+                    </button>
+                    <button type="button" class="demo-btn" onclick="fillDemo('accounts')">
+                        <span class="demo-role">&#128202; Accounts</span>
+                        <span class="demo-name">P. Lakshmi</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            &copy; 2026 Unibio India Hatcheries Pvt Ltd &bull; Cheyyur Taluk, Chengalpattu Dt &bull; Authorized Access Only
+        </footer>
+    </div>
+
+    <script>
+        const AUTH_KEY = "unibio_auth_user";
+        const APP_PAGE = "UniBio Purchase - with Stock.html";
+
+        // Preconfigured user database
+        const USERS = [
+            {
+                username: "admin",
+                password: "password123",
+                name: "Management Director",
+                role: "Management",
+                site: "Unibio (India) Hatcheries Pvt Ltd",
+                email: "management@unibio.in"
+            },
+            {
+                username: "manager",
+                password: "password123",
+                name: "Dr. K. Ramesh",
+                role: "Hatchery Manager",
+                site: "Unibio (India) Hatcheries Pvt Ltd",
+                email: "k.ramesh@unibio.in"
+            },
+            {
+                username: "purchase",
+                password: "password123",
+                name: "S. Arun",
+                role: "Purchase Executive",
+                site: "Unibio (India) Hatcheries Pvt Ltd",
+                email: "arun.purchase@unibio.in"
+            },
+            {
+                username: "store",
+                password: "password123",
+                name: "M. Suresh",
+                role: "Store In-charge",
+                site: "Unit 2",
+                email: "suresh.stores@unibio.in"
+            },
+            {
+                username: "accounts",
+                password: "password123",
+                name: "P. Lakshmi",
+                role: "Accounts Officer",
+                site: "Unibio (India) Hatcheries Pvt Ltd",
+                email: "lakshmi.acc@unibio.in"
+            }
+        ];
+
+        function getStoredUser() {
+            try {
+                return JSON.parse(localStorage.getItem(AUTH_KEY) || sessionStorage.getItem(AUTH_KEY));
+            } catch (e) {
+                return null;
+            }
+        }
+
+        // Check if already authenticated on load
+        window.addEventListener("DOMContentLoaded", () => {
+            const current = getStoredUser();
+            if (current && current.name) {
+                document.getElementById("activeSessionBox").style.display = "block";
+                document.getElementById("activeUserName").textContent = current.name;
+                document.getElementById("activeUserRole").textContent = current.role || "User";
+            }
+        });
+
+        function logoutCurrent() {
+            localStorage.removeItem(AUTH_KEY);
+            sessionStorage.removeItem(AUTH_KEY);
+            document.getElementById("activeSessionBox").style.display = "none";
+            showMsg("info", "Signed out successfully.");
+        }
+
+        function togglePasswordVisibility() {
+            const pw = document.getElementById("password");
+            const btn = document.getElementById("pwToggleText");
+            if (pw.type === "password") {
+                pw.type = "text";
+                btn.textContent = "Hide";
+            } else {
+                pw.type = "password";
+                btn.textContent = "Show";
+            }
+        }
+
+        function showMsg(type, text) {
+            const box = document.getElementById("loginMsg");
+            box.className = "msg-banner " + type;
+            box.textContent = text;
+            box.style.display = "flex";
+        }
+
+        function fillDemo(key) {
+            const u = USERS.find(x => x.username === key);
+            if (!u) return;
+            document.getElementById("username").value = u.username;
+            document.getElementById("password").value = u.password;
+            document.getElementById("site").value = u.site;
+            showMsg("info", `Selected ${u.role}: ${u.name}. Click 'Sign In' or hit Enter.`);
+            document.getElementById("password").focus();
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById("username").value.trim().toLowerCase();
+            const password = document.getElementById("password").value;
+            const site = document.getElementById("site").value;
+            const remember = document.getElementById("rememberMe").checked;
+            const submitBtn = document.getElementById("submitBtn");
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<span>Verifying...</span>`;
+
+            setTimeout(() => {
+                // Find matching user from preset or allow username with default password
+                let matched = USERS.find(u => u.username.toLowerCase() === username || u.email.toLowerCase() === username);
+
+                // Check credentials
+                if (matched) {
+                    if (matched.password !== password) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = `<span>Sign In to System</span>`;
+                        showMsg("error", "Incorrect password. Default demo password is password123");
+                        return;
+                    }
+                } else {
+                    // For flexible testing: if username not in list, accept password123 and create a session
+                    if (password === "password123" || password.length >= 4) {
+                        matched = {
+                            username: username,
+                            name: username.charAt(0).toUpperCase() + username.slice(1),
+                            role: "Staff Member",
+                            site: site,
+                            email: username + "@unibio.in"
+                        };
+                    } else {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = `<span>Sign In to System</span>`;
+                        showMsg("error", "User not found or password too short (min 4 chars). Use demo logins below.");
+                        return;
+                    }
+                }
+
+                // Attach site chosen in form
+                const authData = {
+                    ...matched,
+                    site: site || matched.site,
+                    loginTime: new Date().toISOString()
+                };
+
+                // Store session
+                if (remember) {
+                    localStorage.setItem(AUTH_KEY, JSON.stringify(authData));
+                    sessionStorage.removeItem(AUTH_KEY);
+                } else {
+                    sessionStorage.setItem(AUTH_KEY, JSON.stringify(authData));
+                    localStorage.removeItem(AUTH_KEY);
+                }
+
+                showMsg("success", `Welcome back, ${authData.name}! Redirecting...`);
+
+                setTimeout(() => {
+                    window.location.href = APP_PAGE;
+                }, 400);
+            }, 300);
+        }
+    </script>
+</body>
+
+</html>
