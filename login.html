@@ -494,7 +494,6 @@
                         <input type="checkbox" id="rememberMe" checked>
                         <span>Keep me logged in</span>
                     </label>
-                    <span style="color:var(--mut); font-size:11px;"></span>
                 </div>
 
                 <button type="submit" id="submitBtn" class="btn-submit">
@@ -661,7 +660,7 @@
                     } else {
                         submitBtn.disabled = false;
                         submitBtn.innerHTML = `<span>Sign In to System</span>`;
-                        showMsg("error", "User not found or password too short (min 4 chars). Use demo logins below.");
+                        showMsg("error", "User not found or password too short (min 4 chars). Please check your credentials.");
                         return;
                     }
                 }

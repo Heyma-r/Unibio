@@ -814,7 +814,6 @@
                             <input type="checkbox" id="appRememberMe" checked>
                             <span>Keep me signed in</span>
                         </label>
-                        <span style="color:var(--mut); font-size:11px;">Default passwords assigned per role below</span>
                     </div>
 
                     <button type="submit" id="appSubmitBtn" class="btn-submit">
@@ -822,39 +821,6 @@
                         <span style="font-size:16px">&rarr;</span>
                     </button>
                 </form>
-
-                <div class="demo-section">
-                    <div class="demo-title">
-                        <span>1-Click Demo Accounts</span>
-                        <span>Click to fill</span>
-                    </div>
-                    <div class="demo-grid">
-                        <button type="button" class="demo-btn" onclick="fillAppDemo('admin')">
-                            <span class="demo-role">&#128081; Management</span>
-                            <span class="demo-name">Heyma (Admin)</span>
-                        </button>
-                        <button type="button" class="demo-btn" onclick="fillAppDemo('manager')">
-                            <span class="demo-role">&#128300; Manager</span>
-                            <span class="demo-name">Dr. K. Ramesh</span>
-                        </button>
-                        <button type="button" class="demo-btn" onclick="fillAppDemo('purchase')">
-                            <span class="demo-role">&#128722; Purchase</span>
-                            <span class="demo-name">Ranjith (Unit 2)</span>
-                        </button>
-                        <button type="button" class="demo-btn" onclick="fillAppDemo('store')">
-                            <span class="demo-role">&#128230; Stores</span>
-                            <span class="demo-name">Abinaya</span>
-                        </button>
-                        <button type="button" class="demo-btn" onclick="fillAppDemo('accounts')">
-                            <span class="demo-role">&#128202; Accounts</span>
-                            <span class="demo-name">Balaji</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div style="margin-top:16px; text-align:center">
-                    <a href="login.html" class="link" style="font-size:12px">&rarr; Open Standalone Login Page</a>
-                </div>
             </div>
         </div>
     </div>
@@ -1010,7 +976,7 @@
                     } else {
                         submitBtn.disabled = false;
                         submitBtn.innerHTML = `<span>Sign In &rarr;</span>`;
-                        showAppLoginMsg("error", "User not found or password too short (min 4 chars). Use demo logins below.");
+                        showAppLoginMsg("error", "User not found or password too short (min 4 chars). Please check your credentials.");
                         return;
                     }
                 }
