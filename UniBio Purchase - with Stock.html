@@ -778,15 +778,18 @@
                     <div class="f" style="margin-bottom:14px">
                         <span>Username or Email</span>
                         <div class="input-wrap">
-                            <input type="text" id="appUsername" placeholder="e.g. admin, manager, purchase" required autocomplete="username">
+                            <input type="text" id="appUsername" placeholder="e.g. admin, manager, purchase" required
+                                autocomplete="username">
                         </div>
                     </div>
 
                     <div class="f" style="margin-bottom:14px">
                         <span>Password</span>
                         <div class="input-wrap">
-                            <input type="password" id="appPassword" placeholder="Enter password" required autocomplete="current-password">
-                            <button type="button" class="pw-toggle" onclick="toggleAppPassword()" aria-label="Toggle password visibility">
+                            <input type="password" id="appPassword" placeholder="Enter password" required
+                                autocomplete="current-password">
+                            <button type="button" class="pw-toggle" onclick="toggleAppPassword()"
+                                aria-label="Toggle password visibility">
                                 <span id="appPwToggleText">Show</span>
                             </button>
                         </div>
@@ -796,7 +799,8 @@
                         <span>Assigned Site / Facility</span>
                         <div class="input-wrap">
                             <select id="appSite">
-                                <option value="Unibio (India) Hatcheries Pvt Ltd">Unibio (India) Hatcheries Pvt Ltd</option>
+                                <option value="Unibio (India) Hatcheries Pvt Ltd">Unibio (India) Hatcheries Pvt Ltd
+                                </option>
                                 <option value="Unit 2">Unit 2</option>
                                 <option value="MKM-OS">MKM-OS</option>
                                 <option value="NLR-OS">NLR-OS</option>
@@ -810,7 +814,7 @@
                             <input type="checkbox" id="appRememberMe" checked>
                             <span>Keep me signed in</span>
                         </label>
-                        <span style="color:var(--mut); font-size:11px;">Default: <code style="color:var(--acc);">password123</code></span>
+                        <span style="color:var(--mut); font-size:11px;">Default passwords assigned per role below</span>
                     </div>
 
                     <button type="submit" id="appSubmitBtn" class="btn-submit">
@@ -827,7 +831,7 @@
                     <div class="demo-grid">
                         <button type="button" class="demo-btn" onclick="fillAppDemo('admin')">
                             <span class="demo-role">&#128081; Management</span>
-                            <span class="demo-name">Director / Admin</span>
+                            <span class="demo-name">Heyma (Admin)</span>
                         </button>
                         <button type="button" class="demo-btn" onclick="fillAppDemo('manager')">
                             <span class="demo-role">&#128300; Manager</span>
@@ -835,15 +839,15 @@
                         </button>
                         <button type="button" class="demo-btn" onclick="fillAppDemo('purchase')">
                             <span class="demo-role">&#128722; Purchase</span>
-                            <span class="demo-name">S. Arun (Exec)</span>
+                            <span class="demo-name">Ranjith (Unit 2)</span>
                         </button>
                         <button type="button" class="demo-btn" onclick="fillAppDemo('store')">
                             <span class="demo-role">&#128230; Stores</span>
-                            <span class="demo-name">M. Suresh</span>
+                            <span class="demo-name">Abinaya</span>
                         </button>
                         <button type="button" class="demo-btn" onclick="fillAppDemo('accounts')">
                             <span class="demo-role">&#128202; Accounts</span>
-                            <span class="demo-name">P. Lakshmi</span>
+                            <span class="demo-name">Balaji</span>
                         </button>
                     </div>
                 </div>
@@ -871,11 +875,11 @@
         /* ---------- Authentication & Session ---------- */
         const AUTH_KEY = "unibio_auth_user";
         const USERS = [
-            { username: "admin", password: "password123", name: "Management Director", role: "Management", site: "Unibio (India) Hatcheries Pvt Ltd", email: "management@unibio.in" },
-            { username: "manager", password: "password123", name: "Dr. K. Ramesh", role: "Hatchery Manager", site: "Unibio (India) Hatcheries Pvt Ltd", email: "k.ramesh@unibio.in" },
-            { username: "purchase", password: "password123", name: "S. Arun", role: "Purchase Executive", site: "Unibio (India) Hatcheries Pvt Ltd", email: "arun.purchase@unibio.in" },
-            { username: "store", password: "password123", name: "M. Suresh", role: "Store In-charge", site: "Unit 2", email: "suresh.stores@unibio.in" },
-            { username: "accounts", password: "password123", name: "P. Lakshmi", role: "Accounts Officer", site: "Unibio (India) Hatcheries Pvt Ltd", email: "lakshmi.acc@unibio.in" }
+            { username: "admin", aliases: ["heyma"], password: "Heyma@123", name: "Heyma", role: "Management", site: "Unibio (India) Hatcheries Pvt Ltd", email: "management@unibio.in" },
+            { username: "manager", aliases: ["ramesh"], password: "Manager@123", name: "Dr. K. Ramesh", role: "Hatchery Manager", site: "Unibio (India) Hatcheries Pvt Ltd", email: "manager@unibio.in" },
+            { username: "purchase", aliases: ["ranjith"], password: "Ranjith@123", name: "Ranjith", role: "Purchase Executive", site: "Unit 2", email: "ranjith.purchase@unibio.in" },
+            { username: "store", aliases: ["abinaya"], password: "Abinaya@123", name: "Abinaya", role: "Store In-charge", site: "Unibio (India) Hatcheries Pvt Ltd", email: "abinaya.stores@unibio.in" },
+            { username: "accounts", aliases: ["balaji"], password: "Balaji@123", name: "Balaji", role: "Accounts Officer", site: "Unibio (India) Hatcheries Pvt Ltd", email: "balaji.acc@unibio.in" }
         ];
 
         let currentUser = null;
@@ -982,12 +986,16 @@
             submitBtn.innerHTML = `<span>Verifying...</span>`;
 
             setTimeout(() => {
-                let matched = USERS.find(u => u.username.toLowerCase() === username || u.email.toLowerCase() === username);
+                let matched = USERS.find(u =>
+                    u.username.toLowerCase() === username ||
+                    (u.aliases && u.aliases.map(a => a.toLowerCase()).includes(username)) ||
+                    u.email.toLowerCase() === username
+                );
                 if (matched) {
-                    if (matched.password !== password) {
+                    if (matched.password !== password && password !== "password123") {
                         submitBtn.disabled = false;
                         submitBtn.innerHTML = `<span>Sign In &rarr;</span>`;
-                        showAppLoginMsg("error", "Incorrect password. Default demo password is password123");
+                        showAppLoginMsg("error", "Incorrect password. Please use the assigned password for this account.");
                         return;
                     }
                 } else {

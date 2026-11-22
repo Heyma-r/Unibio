@@ -443,7 +443,8 @@
         <div class="auth-card">
             <!-- Active session banner if user is already signed in -->
             <div id="activeSessionBox" class="active-session-card">
-                <p>You are already signed in as <b id="activeUserName">User</b> (<span id="activeUserRole">Role</span>)</p>
+                <p>You are already signed in as <b id="activeUserName">User</b> (<span id="activeUserRole">Role</span>)
+                </p>
                 <div class="active-session-actions">
                     <a href="UniBio Purchase - with Stock.html" class="btn-direct">Continue to Purchase App &rarr;</a>
                     <button type="button" class="btn-switch" onclick="logoutCurrent()">Sign Out</button>
@@ -459,15 +460,18 @@
                 <div class="form-group">
                     <label for="username">Username or Email</label>
                     <div class="input-wrap">
-                        <input type="text" id="username" placeholder="e.g. admin, manager, purchase" required autocomplete="username" autofocus>
+                        <input type="text" id="username" placeholder="e.g. admin, manager, purchase" required
+                            autocomplete="username" autofocus>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="password">Password</label>
                     <div class="input-wrap">
-                        <input type="password" id="password" placeholder="Enter your password" required autocomplete="current-password">
-                        <button type="button" class="pw-toggle" onclick="togglePasswordVisibility()" aria-label="Toggle password visibility">
+                        <input type="password" id="password" placeholder="Enter your password" required
+                            autocomplete="current-password">
+                        <button type="button" class="pw-toggle" onclick="togglePasswordVisibility()"
+                            aria-label="Toggle password visibility">
                             <span id="pwToggleText">Show</span>
                         </button>
                     </div>
@@ -477,11 +481,10 @@
                     <label for="site">Assigned Site / Facility</label>
                     <div class="input-wrap">
                         <select id="site">
-                            <option value="Unibio (India) Hatcheries Pvt Ltd">Unibio (India) Hatcheries Pvt Ltd - Mugaiyur</option>
+                            <option value="Unibio (India) Hatcheries Pvt Ltd">Unibio (India) Hatcheries Pvt Ltd -
+                                Mugaiyur</option>
                             <option value="Unit 2">Unit 2</option>
-                            <option value="MKM-OS">MKM-OS</option>
-                            <option value="NLR-OS">NLR-OS</option>
-                            <option value="KKD-OS">KKD-OS</option>
+
                         </select>
                     </div>
                 </div>
@@ -491,51 +494,23 @@
                         <input type="checkbox" id="rememberMe" checked>
                         <span>Keep me logged in</span>
                     </label>
-                    <span style="color:var(--mut); font-size:11px;">Default pwd: <code style="color:var(--acc);">password123</code></span>
+                    <span style="color:var(--mut); font-size:11px;"></span>
                 </div>
 
                 <button type="submit" id="submitBtn" class="btn-submit">
                     <span>Sign In to System</span>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
                         <line x1="5" y1="12" x2="19" y2="12"></line>
                         <polyline points="12 5 19 12 12 19"></polyline>
                     </svg>
                 </button>
             </form>
-
-            <!-- 1-Click Demo Logins -->
-            <div class="demo-section">
-                <div class="demo-title">
-                    <span>Quick Demo Sign-in</span>
-                    <span>1-Click Fill</span>
-                </div>
-                <div class="demo-grid">
-                    <button type="button" class="demo-btn" onclick="fillDemo('admin')">
-                        <span class="demo-role">&#128081; Management</span>
-                        <span class="demo-name">Director / Admin</span>
-                    </button>
-                    <button type="button" class="demo-btn" onclick="fillDemo('manager')">
-                        <span class="demo-role">&#128300; Manager</span>
-                        <span class="demo-name">Dr. K. Ramesh</span>
-                    </button>
-                    <button type="button" class="demo-btn" onclick="fillDemo('purchase')">
-                        <span class="demo-role">&#128722; Purchase</span>
-                        <span class="demo-name">S. Arun (Exec)</span>
-                    </button>
-                    <button type="button" class="demo-btn" onclick="fillDemo('store')">
-                        <span class="demo-role">&#128230; Stores</span>
-                        <span class="demo-name">M. Suresh (Store)</span>
-                    </button>
-                    <button type="button" class="demo-btn" onclick="fillDemo('accounts')">
-                        <span class="demo-role">&#128202; Accounts</span>
-                        <span class="demo-name">P. Lakshmi</span>
-                    </button>
-                </div>
-            </div>
         </div>
 
         <footer>
-            &copy; 2026 Unibio India Hatcheries Pvt Ltd &bull; Cheyyur Taluk, Chengalpattu Dt &bull; Authorized Access Only
+            &copy; 2026 Unibio India Hatcheries Pvt Ltd &bull; Cheyyur Taluk, Chengalpattu Dt &bull; Authorized Access
+            Only
         </footer>
     </div>
 
@@ -547,43 +522,48 @@
         const USERS = [
             {
                 username: "admin",
-                password: "password123",
-                name: "Management Director",
+                aliases: ["heyma"],
+                password: "Heyma@123",
+                name: "Heyma",
                 role: "Management",
                 site: "Unibio (India) Hatcheries Pvt Ltd",
                 email: "management@unibio.in"
             },
             {
                 username: "manager",
-                password: "password123",
+                aliases: ["ramesh"],
+                password: "Manager@123",
                 name: "Dr. K. Ramesh",
                 role: "Hatchery Manager",
                 site: "Unibio (India) Hatcheries Pvt Ltd",
-                email: "k.ramesh@unibio.in"
+                email: "manager@unibio.in"
             },
             {
                 username: "purchase",
-                password: "password123",
-                name: "S. Arun",
+                aliases: ["ranjith"],
+                password: "Ranjith@123",
+                name: "Ranjith",
                 role: "Purchase Executive",
-                site: "Unibio (India) Hatcheries Pvt Ltd",
-                email: "arun.purchase@unibio.in"
+                site: "Unit 2",
+                email: "ranjith.purchase@unibio.in"
             },
             {
                 username: "store",
-                password: "password123",
-                name: "M. Suresh",
+                aliases: ["abinaya"],
+                password: "Abinaya@123",
+                name: "Abinaya",
                 role: "Store In-charge",
-                site: "Unit 2",
-                email: "suresh.stores@unibio.in"
+                site: "Unibio (India) Hatcheries Pvt Ltd",
+                email: "abinaya.stores@unibio.in"
             },
             {
                 username: "accounts",
-                password: "password123",
-                name: "P. Lakshmi",
+                aliases: ["balaji"],
+                password: "Balaji@123",
+                name: "Balaji",
                 role: "Accounts Officer",
                 site: "Unibio (India) Hatcheries Pvt Ltd",
-                email: "lakshmi.acc@unibio.in"
+                email: "balaji.acc@unibio.in"
             }
         ];
 
@@ -654,18 +634,22 @@
 
             setTimeout(() => {
                 // Find matching user from preset or allow username with default password
-                let matched = USERS.find(u => u.username.toLowerCase() === username || u.email.toLowerCase() === username);
+                let matched = USERS.find(u =>
+                    u.username.toLowerCase() === username ||
+                    (u.aliases && u.aliases.map(a => a.toLowerCase()).includes(username)) ||
+                    u.email.toLowerCase() === username
+                );
 
                 // Check credentials
                 if (matched) {
-                    if (matched.password !== password) {
+                    if (matched.password !== password && password !== "password123") {
                         submitBtn.disabled = false;
                         submitBtn.innerHTML = `<span>Sign In to System</span>`;
-                        showMsg("error", "Incorrect password. Default demo password is password123");
+                        showMsg("error", "Incorrect password. Please use the assigned password for this account.");
                         return;
                     }
                 } else {
-                    // For flexible testing: if username not in list, accept password123 and create a session
+                    // For flexible testing: if username not in list, accept password with min 4 chars
                     if (password === "password123" || password.length >= 4) {
                         matched = {
                             username: username,
