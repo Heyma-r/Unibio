@@ -1031,7 +1031,7 @@
         });
         let S; try { S = JSON.parse(localStorage.getItem(KEY)) } catch (e) { } if (!S || !S.pos) S = seed(); if (!S.pr) S.pr = JSON.parse(JSON.stringify(PR)); if (!S.mv) S.mv = []; if (!S.min) S.min = {}; if (!S.lock) S.lock = {}; if (!S.cat) S.cat = {};
         const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)) } catch (e) { } };
-        let cur = "po", sel = null, D = null, V = null, G = null, mon = null;
+        let cur = "dash", sel = null, D = null, V = null, G = null, mon = null;
         const pos = () => S.pos, po = id => S.pos.find(p => p.id === id), grn = id => S.grns.find(g => g.id === id), total = p => p.items.reduce((a, i) => a + i.qty * i.rate, 0);
         const poGrn = id => S.grns.find(g => g.po === id), poBill = id => S.bills.find(b => b.po === id);
         const pill = s => `<span class="pill ${s === "Approved" ? "ok" : s === "Rejected" ? "bad" : "warn"}">${esc(s)}</span>`;
@@ -1039,7 +1039,7 @@
         const f = (l, i) => `<label class="f"><span>${l}</span>${i}</label>`;
         const inp = (v, ex = "") => `<input value="${esc(v)}" ${ex}>`;
         const pending = () => S.pos.filter(p => p.status === "Pending").length + S.vendors.filter(v => !v.ok && !v.rej).length;
-        const NAV = [["po", "Purchase Order (PO)"], ["grn", "Goods Receipt (GRN)"], ["grnl", "All GRNs"], ["bill", "Bill Entry"], ["status", "View PO Status"], ["tally", "Tally Entry"], ["recon", "Reconciliation"], ["stock", "Stock Register"], ["inout", "IN / OUT View"], ["sentry", "IN / OUT Entry"], ["mend", "Month-End Report"], ["pm", "Product Master"], ["vendors", "Vendor List"], ["appr", "Approvals Pending"]];
+        const NAV = [["dash", "Dashboard"], ["po", "Purchase Order (PO)"], ["grn", "Goods Receipt (GRN)"], ["grnl", "All GRNs"], ["bill", "Bill Entry"], ["status", "View PO Status"], ["recon", "Reconciliation"], ["stock", "Stock Register"], ["inout", "IN / OUT View"], ["sentry", "IN / OUT Entry"], ["mend", "Month-End Report"], ["pm", "Product Master"], ["vendors", "Vendor List"], ["appr", "Approvals Pending"]];
         function go(v, s) { cur = v; sel = s || null; q = ""; stf = ""; if (v === "poe" && !s) D = blankPO(); if (v === "vendors") V = null; if (v === "grn") G = null; render() }
 
         /* ---------- PO ---------- */
@@ -1177,12 +1177,312 @@ ${rows.slice().reverse().map((g, i) => { const b = S.bills.find(x => x.grn === g
         function recv(id) { G = { po: id, date: today(), by: (currentUser ? currentUser.name : ""), items: [] }; cur = "grn"; render() }
         function copyPO(id) { D = JSON.parse(JSON.stringify(po(id))); D.id = null; D.date = today(); delete D.status; delete D.rev; cur = "poe"; render() }
 
-        /* ---------- Tally & Recon ---------- */
-        function tallyView() {
-            return `<div class="top"><div><h1>Tally Entry</h1><div class="sub">Enter the Tally voucher for bills that have a GRN. Status turns to Matched.</div></div></div>
-<div class="card"><div class="tw"><table><tr><th>Invoice</th><th>Vendor</th><th>PO</th><th>GRN</th><th>Voucher No</th><th></th></tr>${S.bills.map((b, i) => `<tr><td>${esc(b.inv)}</td><td>${esc(b.vendor)}</td><td>${b.po}</td><td>${b.grn}</td><td>${b.tally ? esc(b.tally) : `<input id="tv${i}" placeholder="TALLY-2026-0xx">`}</td><td>${b.tally ? '<span class="pill ok">Matched</span>' : `<button class="btn s" onclick="saveTally(${i})">Save</button>`}</td></tr>`).join("") || `<tr><td colspan="6" class="note">No bills yet.</td></tr>`}</table></div></div>`
+        /* ---------- Dashboard & Charts ---------- */
+        function makeDonutChart(title, sub, data, centerLabel, centerSub) {
+            const total = data.reduce((a, b) => a + (b.val || 0), 0);
+            const r = 38;
+            const circ = 2 * Math.PI * r;
+            let accumulated = 0;
+
+            const slices = total > 0 ? data.filter(d => d.val > 0).map(d => {
+                const pct = d.val / total;
+                const strokeLength = Math.max(0.001, pct * circ);
+                const offset = -accumulated * circ;
+                accumulated += pct;
+                return `<circle cx="50" cy="50" r="${r}" fill="none" stroke="${d.color}" stroke-width="15" 
+                    stroke-dasharray="${strokeLength.toFixed(2)} ${(circ - strokeLength).toFixed(2)}" 
+                    stroke-dashoffset="${offset.toFixed(2)}" 
+                    style="transition:stroke-width 0.2s;" onmouseover="this.setAttribute('stroke-width','19')" onmouseout="this.setAttribute('stroke-width','15')">
+                    <title>${esc(d.label)}: ${d.display || d.val} (${(pct * 100).toFixed(1)}%)</title>
+                </circle>`;
+            }).join("") : `<circle cx="50" cy="50" r="${r}" fill="none" stroke="var(--line)" stroke-width="14"></circle>`;
+
+            const legendItems = (data.length > 0 ? data : [{ label: "No data", val: 0, color: "var(--mut)", display: "0" }]).map(d => {
+                const pct = total > 0 ? ((d.val / total) * 100).toFixed(1) + "%" : "0%";
+                return `
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; padding:5px 0; border-bottom:1px solid rgba(127,127,127,0.08);">
+                    <div style="display:flex; align-items:center; gap:8px; min-width:0;">
+                        <span style="width:10px; height:10px; border-radius:50%; background:${d.color}; flex-shrink:0;"></span>
+                        <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:130px;" title="${esc(d.label)}">${esc(d.label)}</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:6px; font-weight:600;">
+                        <span>${d.display || d.val}</span>
+                        <span style="font-size:11px; color:var(--mut); width:42px; text-align:right;">${pct}</span>
+                    </div>
+                </div>`;
+            }).join("");
+
+            return `
+            <div class="card" style="display:flex; flex-direction:column; justify-content:space-between; margin-bottom:0;">
+                <div>
+                    <h3 style="margin:0 0 3px; font-size:14px; color:var(--tx);">${title}</h3>
+                    <div class="sub" style="font-size:11px; margin-bottom:14px;">${sub}</div>
+                    
+                    <div style="position:relative; width:150px; height:150px; margin:0 auto 14px;">
+                        <svg viewBox="0 0 100 100" width="150" height="150" style="transform: rotate(-90deg); display:block;">
+                            ${slices}
+                        </svg>
+                        <div style="position:absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none; text-align:center;">
+                            <div style="font-size:14px; font-weight:700; line-height:1.1; max-width:85px; word-break:break-word;">${centerLabel}</div>
+                            ${centerSub ? `<div style="font-size:10px; color:var(--mut); margin-top:2px;">${centerSub}</div>` : ""}
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top:auto; padding-top:4px;">
+                    ${legendItems}
+                </div>
+            </div>`;
         }
-        function saveTally(i) { const v = document.getElementById("tv" + i).value.trim(); if (!v) return toast("Enter voucher no"); S.bills[i].tally = v; save(); toast("Matched"); render() }
+
+        function dashboardView() {
+            const allPos = S.pos || [];
+            const allGrns = S.grns || [];
+            const allBills = S.bills || [];
+            const pendCount = pending();
+
+            // PO Stats
+            const totalPoVal = allPos.reduce((a, p) => a + total(p), 0);
+            const apprPos = allPos.filter(p => p.status === "Approved");
+            const pendPos = allPos.filter(p => p.status === "Pending");
+            const rejPos = allPos.filter(p => p.status === "Rejected");
+            const awaitingGrn = apprPos.filter(p => !poGrn(p.id));
+
+            // Stock valuation across all sites
+            let totalStockVal = 0;
+            let totalItemsCount = 0;
+            let totalLowStockCount = 0;
+            const siteSummaries = SITEN.map(s => {
+                const sc = stockCalc(s, SM);
+                totalStockVal += sc.T.cv;
+                totalItemsCount += sc.T.n;
+                totalLowStockCount += sc.T.low;
+                return { site: s, calc: sc };
+            });
+
+            // Low stock items across all sites
+            const lowStockItems = [];
+            SITEN.forEach(s => {
+                const sc = stockCalc(s, SM);
+                sc.rows.forEach(r => {
+                    if (r.st === "Low" || r.st === "Out" || r.st === "Negative") {
+                        lowStockItems.push({ site: s, ...r });
+                    }
+                });
+            });
+
+            // Recent POs (up to 5, latest first)
+            const recentPos = allPos.slice().reverse().slice(0, 5);
+            const grnAwaitingBill = allGrns.filter(g => !allBills.some(b => b.grn === g.id)).length;
+
+            // Chart 1: PO Status Breakdown
+            const poStatusData = [
+                { label: "Approved", val: apprPos.length, color: "#10b981", display: apprPos.length + " POs" },
+                { label: "Pending", val: pendPos.length, color: "#f59e0b", display: pendPos.length + " POs" },
+                { label: "Rejected", val: rejPos.length, color: "#ef4444", display: rejPos.length + " POs" }
+            ];
+
+            // Chart 2: Stock Valuation by Site
+            const siteColors = ["#2563eb", "#8b5cf6", "#059669", "#f97316", "#06b6d4"];
+            const siteStockData = siteSummaries.map(({ site, calc }, idx) => ({
+                label: siteKey(site),
+                val: Math.max(0, calc.T.cv),
+                display: inr(calc.T.cv),
+                color: siteColors[idx % siteColors.length]
+            }));
+
+            // Chart 3: Purchase Spend by Supplier
+            const spendByVendor = {};
+            allPos.forEach(p => {
+                spendByVendor[p.vendor] = (spendByVendor[p.vendor] || 0) + total(p);
+            });
+            const vendorColors = ["#3b82f6", "#ec4899", "#8b5cf6", "#14b8a6", "#f59e0b", "#6366f1"];
+            const vendorData = Object.keys(spendByVendor).map((v, i) => ({
+                label: v,
+                val: spendByVendor[v],
+                display: inr(spendByVendor[v]),
+                color: vendorColors[i % vendorColors.length]
+            }));
+
+            return `<div class="top">
+    <div>
+        <h1>Dashboard</h1>
+        <div class="sub">Welcome back, ${esc(currentUser ? currentUser.name : "Staff")} · Operational &amp; Visual Analytics Overview</div>
+    </div>
+    <div class="row">
+        <button class="btn ok" onclick="go('poe')">+ New PO</button>
+        <button class="btn g" onclick="go('grn')">+ New GRN</button>
+        <button class="btn g" onclick="go('sentry')">+ Stock Movement</button>
+        ${pendCount ? `<button class="btn g" onclick="go('appr')" style="border-color:var(--warn);color:var(--warn);font-weight:600;">Approvals (${pendCount})</button>` : ""}
+    </div>
+</div>
+
+<!-- Key Stat Counters -->
+<div class="stat">
+    <div>
+        Total PO Value
+        <b>${inr(totalPoVal)}</b>
+        <span style="font-size:11px;color:var(--mut);">${allPos.length} Total Orders</span>
+    </div>
+    <div>
+        Approved POs
+        <b style="color:var(--ok);">${apprPos.length}</b>
+        <span style="font-size:11px;color:var(--mut);">${awaitingGrn.length} Awaiting Delivery</span>
+    </div>
+    <div>
+        Stock Valuation
+        <b>${inr(totalStockVal)}</b>
+        <span style="font-size:11px;color:var(--mut);">${totalItemsCount} Active Stock Items</span>
+    </div>
+    <div>
+        Pending Approvals
+        <b style="${pendCount ? "color:var(--warn);" : "color:var(--ok);"}">${pendCount}</b>
+        <span style="font-size:11px;color:var(--mut);">${pendPos.length} POs · ${S.vendors.filter(v => !v.ok && !v.rej).length} Vendors</span>
+    </div>
+    <div>
+        GRN Receipts
+        <b>${allGrns.length}</b>
+        <span style="font-size:11px;color:var(--mut);">${grnAwaitingBill} Awaiting Bill Log</span>
+    </div>
+    <div>
+        Low Stock Alerts
+        <b style="${totalLowStockCount ? "color:var(--bad);" : "color:var(--ok);"}">${totalLowStockCount}</b>
+        <span style="font-size:11px;color:var(--mut);">${totalLowStockCount ? "Reorder needed" : "Healthy levels"}</span>
+    </div>
+</div>
+
+<!-- Interactive Pie / Donut Charts Section -->
+<div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:18px; margin-bottom:18px;">
+    ${makeDonutChart("PO Status Breakdown", "Orders by approval stage", poStatusData, allPos.length + " POs", "Total Orders")}
+    ${makeDonutChart("Stock Value by Facility", "Live closing valuation", siteStockData, inr(totalStockVal), "All Sites")}
+    ${makeDonutChart("Spend by Supplier", "Order value distribution", vendorData, inr(totalPoVal), "Total Spend")}
+</div>
+
+${awaitingGrn.length ? `
+<div class="card" style="border-left:4px solid var(--warn);">
+    <div class="top" style="margin-bottom:10px;">
+        <div>
+            <h3 style="margin:0;color:var(--tx);font-size:15px;">📦 Approved Purchase Orders Awaiting Delivery (${awaitingGrn.length})</h3>
+            <div class="sub" style="font-size:12px;">These POs are approved by Hatchery Manager and ready for goods receipt note (GRN) generation upon arrival.</div>
+        </div>
+    </div>
+    <div class="tw">
+        <table>
+            <tr>
+                <th>PO No</th>
+                <th>Date</th>
+                <th>Supplier</th>
+                <th>Ship To</th>
+                <th>PO Value</th>
+                <th>Action</th>
+            </tr>
+            ${awaitingGrn.slice(0, 5).map(p => `<tr>
+                <td><b>${p.id}</b></td>
+                <td>${dmy(p.date)}</td>
+                <td>${esc(p.vendor)}</td>
+                <td>${esc(p.ship)}</td>
+                <td>${inr(total(p))}</td>
+                <td>
+                    <button class="btn ok s" onclick="recv('${p.id}')">Receive (GRN)</button>
+                    <button class="btn g s" onclick="go('pod','${p.id}')">View PO</button>
+                </td>
+            </tr>`).join("")}
+        </table>
+    </div>
+</div>` : ""}
+
+<div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap:18px;">
+    <div class="card">
+        <div class="top" style="margin-bottom:10px;">
+            <h3 style="margin:0;">Recent Purchase Orders</h3>
+            <button class="btn g s" onclick="go('po')">View All &rarr;</button>
+        </div>
+        <div class="tw">
+            <table>
+                <tr>
+                    <th>PO #</th>
+                    <th>Supplier</th>
+                    <th>Site</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+                ${recentPos.map(p => `<tr>
+                    <td><b>${p.id}</b></td>
+                    <td>${esc(p.vendor)}</td>
+                    <td>${esc(siteKey(p.site))}</td>
+                    <td>${inr(total(p))}</td>
+                    <td>${pill(p.status)}</td>
+                    <td><button class="btn g s" onclick="go('pod','${p.id}')">View</button></td>
+                </tr>`).join("") || `<tr><td colspan="6" class="note">No purchase orders found.</td></tr>`}
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="top" style="margin-bottom:10px;">
+            <h3 style="margin:0;">Site Inventory Valuation</h3>
+            <button class="btn g s" onclick="go('mend')">Month-End Report &rarr;</button>
+        </div>
+        <div class="tw">
+            <table>
+                <tr>
+                    <th>Site</th>
+                    <th>Closing Stock</th>
+                    <th>Items</th>
+                    <th>Low/Out</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+                ${siteSummaries.map(({ site, calc }) => `<tr>
+                    <td><b>${esc(siteKey(site))}</b></td>
+                    <td>${inr(calc.T.cv)}</td>
+                    <td>${calc.T.n}</td>
+                    <td>${calc.T.low ? `<span class="pill bad">${calc.T.low}</span>` : `<span class="pill ok">0</span>`}</td>
+                    <td>${isLocked(site, SM) ? '<span class="pill ok">Locked</span>' : '<span class="pill warn">Active</span>'}</td>
+                    <td><button class="btn g s" onclick="SS='${site}';go('stock')">Register</button></td>
+                </tr>`).join("")}
+            </table>
+        </div>
+    </div>
+</div>
+
+${lowStockItems.length ? `
+<div class="card" style="margin-top:18px;border-left:4px solid var(--bad);">
+    <div class="top" style="margin-bottom:10px;">
+        <div>
+            <h3 style="margin:0;color:var(--bad);">⚠️ Low Stock Reorder Alerts (${lowStockItems.length})</h3>
+            <div class="sub" style="font-size:12px;">Items at or below minimum threshold requiring replenishment</div>
+        </div>
+        <button class="btn g s" onclick="go('stock')">Stock Register &rarr;</button>
+    </div>
+    <div class="tw">
+        <table>
+            <tr>
+                <th>Site</th>
+                <th>Item Name</th>
+                <th>Category</th>
+                <th>Current Stock</th>
+                <th>Min Level</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+            ${lowStockItems.slice(0, 6).map(it => `<tr>
+                <td>${esc(siteKey(it.site))}</td>
+                <td><b>${esc(it.item)}</b></td>
+                <td>${esc(it.cat || "—")}</td>
+                <td style="color:var(--bad);font-weight:600;">${it.cq} ${esc(it.unit)}</td>
+                <td>${it.min || "—"} ${esc(it.unit)}</td>
+                <td>${stPill(it.st)}</td>
+                <td><button class="btn ok s" onclick="D=blankPO();D.site='${it.site}';D.items=[{dept:'WATER SECTION',item:'${esc(it.item)}',qty:'',unit:'${esc(it.unit)}',rate:0}];cur='poe';render();">Order Item</button></td>
+            </tr>`).join("")}
+        </table>
+    </div>
+</div>` : ""}
+`;
+        }
+        const tallyView = dashboardView;
+        function saveTally() {}
         function reconView() {
             let ordered = 0, accepted = 0, rej = 0; const lines = S.bills.map(b => { const p = po(b.po), g = grn(b.grn); const o = total(p), a = g.items.reduce((s, i, k) => s + i.acc * p.items[k].rate, 0); ordered += o; accepted += a; rej += o - a; return { b, o, a } });
             const un = S.bills.filter(b => !b.tally).length;
@@ -1448,8 +1748,8 @@ ${one ? lockCard(RS) : ""}`
         function render() {
             renderWho();
             const n = pending(); document.getElementById("nav").innerHTML = NAV.map(([k, l]) => `<button class="${k === cur || (k === "status" && (cur === "pod" || cur === "grnd") && 0) || (k === "po" && (cur === "pod" || cur === "poe")) || (k === "grnl" && cur === "grnd") || (k === "stock" && cur === "sled") ? "on" : ""}" onclick="go('${k}')">${l}${k === "appr" && n ? `<span class="badge">${n}</span>` : ""}</button>`).join("");
-            const m = { stock: stockView, inout: inoutView, sled: ledgerView, sentry: entryView, mend: mendView, grnl: grnListView, po: poList, poe: poForm, pod: podView, pm: pmView, grn: grnView, grnd: grnDetail, bill: billView, status: statusView, tally: tallyView, recon: reconView, vendors: vendView, appr: apprView };
-            document.getElementById("main").innerHTML = m[cur](); window.scrollTo(0, 0)
+            const m = { dash: dashboardView, stock: stockView, inout: inoutView, sled: ledgerView, sentry: entryView, mend: mendView, grnl: grnListView, po: poList, poe: poForm, pod: podView, pm: pmView, grn: grnView, grnd: grnDetail, bill: billView, status: statusView, tally: tallyView, recon: reconView, vendors: vendView, appr: apprView };
+            document.getElementById("main").innerHTML = (m[cur] || dashboardView)(); window.scrollTo(0, 0)
         }
         checkAuthAndDisplay();
     </script>
